@@ -76,8 +76,8 @@ namespace PlcFxUa
                 this.nodeInfo = getNodeInfo(rd);
                 tableBrowser.DataSource = this.nodeInfo;
             }
-
             browsing.Populate((NodeId)rd.NodeId, e.Node.Nodes);
+
 
             tableBrowser.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
             tableBrowser.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
@@ -98,6 +98,8 @@ namespace PlcFxUa
 
         private List<NodeInfo> getNodeInfo(ReferenceDescription rd)
         {
+            Node node = new Node(rd);
+
             var list = new List<NodeInfo>();
             list.Add(new NodeInfo()
             {
@@ -139,6 +141,18 @@ namespace PlcFxUa
             {
                 Attribute = "Identifier Type",
                 Value = rd.NodeId.IdType.ToString()
+            });
+
+            list.Add(new NodeInfo()
+            {
+                Attribute = "User Write Mask",
+                Value = node.UserWriteMask.ToString()
+            });
+
+            list.Add(new NodeInfo()
+            {
+                Attribute = "Write Mask",
+                Value = node.WriteMask.ToString()
             });
 
             return list;

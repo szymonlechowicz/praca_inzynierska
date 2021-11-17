@@ -72,7 +72,7 @@ namespace PlcFxUa
             // subscriptionLabel
             // 
             this.subscriptionLabel.AutoSize = true;
-            this.subscriptionLabel.Location = new System.Drawing.Point(423, 338);
+            this.subscriptionLabel.Location = new System.Drawing.Point(423, 448);
             this.subscriptionLabel.Name = "subscriptionLabel";
             this.subscriptionLabel.Size = new System.Drawing.Size(119, 17);
             this.subscriptionLabel.TabIndex = 2;
@@ -81,7 +81,7 @@ namespace PlcFxUa
             // nameLabel
             // 
             this.nameLabel.AutoSize = true;
-            this.nameLabel.Location = new System.Drawing.Point(423, 291);
+            this.nameLabel.Location = new System.Drawing.Point(423, 401);
             this.nameLabel.Name = "nameLabel";
             this.nameLabel.Size = new System.Drawing.Size(46, 17);
             this.nameLabel.TabIndex = 3;

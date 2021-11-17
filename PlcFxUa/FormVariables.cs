@@ -122,11 +122,8 @@ namespace PlcFxUa
                     };
                     item.Notification += OnNotification;
                     
-                    //item.MonitoringMode = MonitoringMode.Reporting;
                     subscription.AddItem(item);
                     
-
-                    //nameLabel.Text = rd.DisplayName.ToString();
                 }
 
                 subscription.ApplyChanges();
@@ -155,18 +152,12 @@ namespace PlcFxUa
                 if (data.Value.WrappedValue.TypeInfo.ValueRank >= 0)
                     type += "[]";
 
-
-                //nameLabel.Text = item.DisplayName;
-                //MonitorLabel.Text = "Value: " + data.Value.Value +
-                //    "\nDataType: " + type + "\nTime: " + data.Value.SourceTimestamp.ToString() +
-                //    "\n\n If you want, add this to list of monitored items";
-
                 string nodeId = item.StartNodeId.ToString();
 
                 var measurement = new Measurement()
                 {
                     time = data.Value.SourceTimestamp,
-                    value = data.Value.Value.ToString()
+                    value = data.Value.WrappedValue.ToString()
                 };
 
 
@@ -220,6 +211,9 @@ namespace PlcFxUa
         {
             DataGridViewRow row = ItemsView.Rows[e.RowIndex];
 
+            btnModify.Enabled = false;
+            WriteTextBox.Enabled = false;
+
             switch (e.ColumnIndex)
             {
                 // deleting
@@ -236,8 +230,10 @@ namespace PlcFxUa
 
                         string nodeToRemove = monitoredItem.StartNodeId.ToString();
                         var item = context.Items.Single(i => i.nodeId == nodeToRemove);
-                        
-                        // TO DO: usunięcie z measurements
+
+                        var measurements = context.Measurements.Where(m => m.monitoredId == item.ID);
+                        context.Measurements.RemoveRange(measurements);
+
                         context.Items.Remove(item);
                         context.SaveChanges();
 
@@ -249,11 +245,6 @@ namespace PlcFxUa
                     {
                         try
                         {
-                            row.ReadOnly = false;
-                            btnModify.Enabled = true;
-                            WriteTextBox.Enabled = true;
-                            row.ReadOnly = true;
-
                             parent.operationLabel.Text = null;
                             parent.operationLabel.Visible = false;
 
@@ -262,14 +253,29 @@ namespace PlcFxUa
                                 StartNodeId = row.Cells[5].Value.ToString(),
                                 DisplayName = row.Cells[1].Value.ToString()
                             };
-
+                            
+                            
                             string nodeToWrite = monitoredItem.StartNodeId.ToString();
                             var item = context.Items.Single(i => i.nodeId == nodeToWrite);
 
+                            if (item.dataType[item.dataType.Length-1] == ']')
+                            {
+                                MessageBox.Show("Error! This node is an array! Search it in submenu 'Structure'");
+                            }
+                            else
+                            {
+                                this.changeableNode = nodeToWrite;
+                                this.dataType = item.dataType;
 
-                            this.changeableNode = nodeToWrite;
-                            this.dataType = item.dataType;
+                                btnModify.Enabled = true;
+                                WriteTextBox.Enabled = true;
 
+
+                                Thread.Sleep(1000);
+                                context.Items.Remove(item);
+                                context.SaveChanges();
+                            }
+                            
                         }
                         catch (Exception exc)
                         {
@@ -313,7 +319,7 @@ namespace PlcFxUa
 
                 StatusCodeCollection results = null;
                 DiagnosticInfoCollection diagnosticInfos = null;
-
+                
                 this.session.Write(
                     null,
                     valuesToWrite,
@@ -335,6 +341,7 @@ namespace PlcFxUa
                 parent.operationLabel.Visible = true;
                 btnModify.Enabled = false;
                 WriteTextBox.Enabled = false;
+
             }
 
             catch (Exception exc)

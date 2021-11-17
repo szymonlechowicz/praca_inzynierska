@@ -57,7 +57,7 @@ namespace PlcFxUa
 
         private void subStruct_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new FormStructure(this, session));
+            OpenChildForm(new FormStructure(this, session, context));
         }
         private void menuStart_Click(object sender, EventArgs e)
         {

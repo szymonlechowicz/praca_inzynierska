@@ -47,101 +47,6 @@ namespace PlcFxUa
             this.session = newSession;
         }
 
-        public void ReadMethodArguments(Argument[] inputArguments, NodeId nodeId)
-        {
-
-            // build list of references to browse.
-            BrowseDescriptionCollection nodesToBrowse = new BrowseDescriptionCollection();
-
-            BrowseDescription nodeToBrowse = new BrowseDescription();
-
-            nodeToBrowse.NodeId = nodeId;
-            nodeToBrowse.BrowseDirection = BrowseDirection.Forward;
-            nodeToBrowse.ReferenceTypeId = ReferenceTypeIds.HasProperty;
-            nodeToBrowse.IncludeSubtypes = true;
-            nodeToBrowse.NodeClassMask = (uint)NodeClass.Variable;
-            nodeToBrowse.ResultMask = (uint)BrowseResultMask.BrowseName;
-
-            nodesToBrowse.Add(nodeToBrowse);
-
-            // find properties.
-            ReferenceDescriptionCollection references = Browse(this.session, nodesToBrowse, false);
-
-            // build list of properties to read.
-            ReadValueIdCollection nodesToRead = new ReadValueIdCollection();
-
-            for (int i = 0; references != null && i < references.Count; i++)
-            {
-                ReferenceDescription reference = references[i];
-
-                // ignore out of server references.
-                if (reference.NodeId.IsAbsolute)
-                {
-                    continue;
-                }
-
-                // ignore other properties.
-                if (reference.BrowseName != BrowseNames.InputArguments && reference.BrowseName != BrowseNames.OutputArguments)
-                {
-                    continue;
-                }
-
-                ReadValueId nodeToRead = new ReadValueId();
-                nodeToRead.NodeId = (NodeId)reference.NodeId;
-                nodeToRead.AttributeId = Attributes.Value;
-                nodeToRead.Handle = reference;
-                nodesToRead.Add(nodeToRead);
-            }
-
-            // method has no arguments.
-            if (nodesToRead.Count == 0)
-            {
-                return;
-            }
-
-            // read the arguments.
-            DataValueCollection results = null;
-            DiagnosticInfoCollection diagnosticInfos = null;
-
-            this.session.Read(
-                null,
-                0,
-                TimestampsToReturn.Neither,
-                nodesToRead,
-                out results,
-                out diagnosticInfos);
-
-            ClientBase.ValidateResponse(results, nodesToRead);
-            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
-
-            // save the results.
-            for (int i = 0; i < results.Count; i++)
-            {
-                ReferenceDescription reference = (ReferenceDescription)nodesToRead[i].Handle;
-
-                if (StatusCode.IsGood(results[i].StatusCode))
-                {
-                    if (reference.BrowseName == BrowseNames.InputArguments)
-                    {
-                        inputArguments = (Argument[])ExtensionObject.ToArray(results[i].GetValue<ExtensionObject[]>(null), typeof(Argument));
-                    }
-
-                    //if (reference.BrowseName == BrowseNames.OutputArguments)
-                    //{
-                    //    outputArguments = (Argument[])ExtensionObject.ToArray(results[i].GetValue<ExtensionObject[]>(null), typeof(Argument));
-                    //}
-                }
-            }
-
-            // set default values for input arguments.
-            if (inputArguments != null)
-            {
-                foreach (Argument argument in inputArguments)
-                {
-                    argument.Value = TypeInfo.GetDefaultValue(argument.DataType, argument.ValueRank, this.session.TypeTree);
-                }
-            }
-        }
         public void Populate(NodeId sourceId, TreeNodeCollection nodes)
         {
             Populate(sourceId, nodes, (uint)(NodeClass.Object | NodeClass.ObjectType |
@@ -151,7 +56,6 @@ namespace PlcFxUa
         {
 
             nodes.Clear();
-
 
             // find all of the components of the node.
             BrowseDescription nodeToBrowse1 = new BrowseDescription();

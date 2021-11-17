@@ -278,12 +278,6 @@
     <Compile Include="FormStructure.Designer.cs">
       <DependentUpon>FormStructure.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormChange.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormChange.Designer.cs">
-      <DependentUpon>FormChange.cs</DependentUpon>
-    </Compile>
     <Compile Include="FormData.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -332,9 +326,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormBrowse.resx">
       <DependentUpon>FormBrowse.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormChange.resx">
-      <DependentUpon>FormChange.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormConnect.resx">
       <DependentUpon>FormConnect.cs</DependentUpon>

@@ -33,16 +33,12 @@ namespace PlcFxUa
             this.parent = formStart;
             this.session = mainSession;
             if (this.session != null)
+            {
                 this.browsing = new BrowsingClass(this.session);
-            //dataGridView1.AutoGenerateColumns = false;
-
-            //this.dataset = new DataSet();
-            //dataset.Tables.Add("Arguments");
-            //dataset.Tables[0].Columns.Add("Name", typeof(string));
-            //dataset.Tables[0].Columns.Add("DataType", typeof(string));
-            //dataset.Tables[0].Columns.Add("Value", typeof(Variant));
-
-            //dataGridView1.DataSource = dataset.Tables[0];
+                treeServer.BeginUpdate();
+                browsing.Populate(ObjectIds.ObjectsFolder, treeServer.Nodes);
+                treeServer.EndUpdate();
+            }
 
             inputLV.View = View.Details;
             inputLV.GridLines = true;
@@ -70,54 +66,8 @@ namespace PlcFxUa
             parent.GetSession(session);
         }
 
-        private void btnInfo_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (session == null || !session.Connected)
-                {
-                    MethodTB.Text = "No session";
-                    return;
-                }
-
-                methodId = NodeId.Parse(MethodTB.Text);
-                objectId = NodeId.Parse(ObjectTB.Text);
-
-                if (objectId == null || methodId == null)
-                {
-                    return;
-                }
-                //browsing.ReadMethodArguments(this.input, methodId);
-
-
-                Display(true);
-                Display(false);
-
-                UpdateParent();
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
-            }
-        }
-
         private void Display(bool isInput)
         {
-            //dataset.tables[0].rows.clear();
-
-            //if (input != null)
-            //{
-            //    foreach (var argument in this.input)
-            //    {
-            //        string[] row = new string[3];
-            //        row = UpdateRow(row, argument, new Variant(argument.Value));
-            //        var item = new ListViewItem(row);
-            //        inputLV.Items.Add(item);
-            //    }
-            //}
-            //else
-            //    button1.Text = "No input";
-
             if (isInput)
                 inputLV.Items.Clear();
             else
@@ -218,6 +168,7 @@ namespace PlcFxUa
                 request.InputArguments = inputs;
 
                 CallMethodRequestCollection requests = new CallMethodRequestCollection();
+                requests.Add(request);
 
                 CallMethodResultCollection results;
                 DiagnosticInfoCollection diagnosticInfos;
@@ -225,14 +176,14 @@ namespace PlcFxUa
                 ResponseHeader response = this.session.Call(null, requests, out results, out diagnosticInfos);
 
                 if (StatusCode.IsBad(results[0].StatusCode))
-                    throw new ServiceResultException(new ServiceResult(results[0].StatusCode, 0, diagnosticInfos, response.StringTable));
+                    throw new ServiceResultException(new ServiceResult(results[0].StatusCode, 0, diagnosticInfos, 
+                        response.StringTable));
 
                 SetOutput(results[0].OutputArguments);
 
                 if (results[0].OutputArguments.Count == 0)
                     MessageBox.Show(this, "Calling method completed");
 
-                Display(false);
             }
             catch (Exception exc)
             {
@@ -250,9 +201,10 @@ namespace PlcFxUa
 
                 if (argument != null)
                 {
-                    inputs.Add(new Variant(argument.Value));
+                    inputs.Add(new Variant(AddTypeValue(argument, item)));
                 }
             }
+
             return inputs;
         }
 
@@ -279,25 +231,98 @@ namespace PlcFxUa
 
             if (inputLV.SelectedIndices.Count > 0) 
                 modifyTB.Text = inputLV.SelectedItems[0].SubItems[2].Text;
-
-            //FormChange formChange = new FormChange();
-            //formChange.Show();
         }
 
         private void btnModify_Click(object sender, EventArgs e)
         {
+            
             inputLV.SelectedItems[0].SubItems[2].Text = modifyTB.Text;
             if (inputLV.SelectedIndices.Count > 0)
                 for (int i = 0; i < inputLV.SelectedIndices.Count; i++)
-                {
                     inputLV.Items[inputLV.SelectedIndices[i]].Selected = false;
+
+            btnModify.Enabled = false;
+            modifyTB.Enabled = false;
+        }
+        
+        private void treeServer_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            try
+            {
+                // check if node has already been expanded once.
+                if (e.Node.Nodes.Count != 1 || e.Node.Nodes[0].Text != String.Empty)
+                {
+                    return;
                 }
-            modifyTB.Enabled = false;
-            modifyTB.Enabled = false;
+
+                // get the source for the node.
+                ReferenceDescription rd = e.Node.Tag as ReferenceDescription;
+
+                if (rd == null || rd.NodeId.IsAbsolute)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
+                // populate children.
+                browsing.Populate((NodeId)rd.NodeId, e.Node.Nodes, (uint)(NodeClass.Object | NodeClass.ObjectType |
+                NodeClass.Method));
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
+
+        private void treeServer_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            try
+            {
+                if (session == null || !session.Connected)
+                {
+                    parent.operationLabel.Text = "No session";
+                    return;
+                }
+
+                ReferenceDescription rd = e.Node.Tag as ReferenceDescription;
+                ReferenceDescription rdParent = null;
+
+                if (e.Node.Parent != null)
+                {
+                    rdParent = e.Node.Parent.Tag as ReferenceDescription;
+                }
+                else
+                {
+                    rdParent = rd;
+                }
+
+                if (rd == null || rd.NodeId.IsAbsolute)
+                {
+                    return;
+                }
+                else
+                {
+                    methodId = (NodeId)rd.NodeId;
+                    objectId = (NodeId)rdParent.NodeId;
+                }
+
+                if (objectId == null || methodId == null)
+                {
+                    return;
+                }
+
+                Display(true);
+                Display(false);
+
+                UpdateParent();
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
         }
         private object AddTypeValue(Argument argument, ListViewItem item)
         {
-            //object tempValue = (value != null) ? value.Value : null;
             object tempValue;
 
             switch (this.session.NodeCache.GetDisplayText(argument.DataType))
@@ -376,6 +401,20 @@ namespace PlcFxUa
             }
 
             return tempValue;
+        }
+
+        private void modifyTB_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                inputLV.SelectedItems[0].SubItems[2].Text = modifyTB.Text;
+                if (inputLV.SelectedIndices.Count > 0)
+                    for (int i = 0; i < inputLV.SelectedIndices.Count; i++)
+                        inputLV.Items[inputLV.SelectedIndices[i]].Selected = false;
+
+                btnModify.Enabled = false;
+                modifyTB.Enabled = false;
+            }
         }
     }
 }
