@@ -30,13 +30,12 @@ namespace PlcFxUa
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.menuData = new System.Windows.Forms.Button();
+            this.menuPID = new System.Windows.Forms.Button();
             this.MenuCalling = new System.Windows.Forms.Button();
-            this.subStruct = new System.Windows.Forms.Button();
-            this.subVariables = new System.Windows.Forms.Button();
+            this.menuData = new System.Windows.Forms.Button();
             this.menuMonitor = new System.Windows.Forms.Button();
             this.menuBrowse = new System.Windows.Forms.Button();
-            this.menuStart = new System.Windows.Forms.Button();
+            this.menuConnect = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panelStatus = new System.Windows.Forms.Panel();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
@@ -51,13 +50,12 @@ namespace PlcFxUa
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.ButtonShadow;
-            this.panel1.Controls.Add(this.menuData);
+            this.panel1.Controls.Add(this.menuPID);
             this.panel1.Controls.Add(this.MenuCalling);
-            this.panel1.Controls.Add(this.subStruct);
-            this.panel1.Controls.Add(this.subVariables);
+            this.panel1.Controls.Add(this.menuData);
             this.panel1.Controls.Add(this.menuMonitor);
             this.panel1.Controls.Add(this.menuBrowse);
-            this.panel1.Controls.Add(this.menuStart);
+            this.panel1.Controls.Add(this.menuConnect);
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel1.Location = new System.Drawing.Point(0, 0);
@@ -65,21 +63,21 @@ namespace PlcFxUa
             this.panel1.Size = new System.Drawing.Size(308, 568);
             this.panel1.TabIndex = 10;
             // 
-            // menuData
+            // menuPID
             // 
-            this.menuData.Dock = System.Windows.Forms.DockStyle.Top;
-            this.menuData.Location = new System.Drawing.Point(0, 440);
-            this.menuData.Name = "menuData";
-            this.menuData.Size = new System.Drawing.Size(308, 64);
-            this.menuData.TabIndex = 12;
-            this.menuData.Text = "Data";
-            this.menuData.UseVisualStyleBackColor = true;
-            this.menuData.Click += new System.EventHandler(this.menuData_Click);
+            this.menuPID.Dock = System.Windows.Forms.DockStyle.Top;
+            this.menuPID.Location = new System.Drawing.Point(0, 400);
+            this.menuPID.Name = "menuPID";
+            this.menuPID.Size = new System.Drawing.Size(308, 65);
+            this.menuPID.TabIndex = 18;
+            this.menuPID.Text = "PID";
+            this.menuPID.UseVisualStyleBackColor = true;
+            this.menuPID.Click += new System.EventHandler(this.menuPID_Click);
             // 
             // MenuCalling
             // 
             this.MenuCalling.Dock = System.Windows.Forms.DockStyle.Top;
-            this.MenuCalling.Location = new System.Drawing.Point(0, 377);
+            this.MenuCalling.Location = new System.Drawing.Point(0, 337);
             this.MenuCalling.Name = "MenuCalling";
             this.MenuCalling.Size = new System.Drawing.Size(308, 63);
             this.MenuCalling.TabIndex = 16;
@@ -87,36 +85,24 @@ namespace PlcFxUa
             this.MenuCalling.UseVisualStyleBackColor = true;
             this.MenuCalling.Click += new System.EventHandler(this.MenuCalling_Click);
             // 
-            // subStruct
+            // menuData
             // 
-            this.subStruct.Dock = System.Windows.Forms.DockStyle.Top;
-            this.subStruct.Location = new System.Drawing.Point(0, 312);
-            this.subStruct.Name = "subStruct";
-            this.subStruct.Size = new System.Drawing.Size(308, 65);
-            this.subStruct.TabIndex = 18;
-            this.subStruct.Text = "Structure";
-            this.subStruct.UseVisualStyleBackColor = true;
-            this.subStruct.Click += new System.EventHandler(this.subStruct_Click);
-            // 
-            // subVariables
-            // 
-            this.subVariables.Dock = System.Windows.Forms.DockStyle.Top;
-            this.subVariables.Location = new System.Drawing.Point(0, 259);
-            this.subVariables.Name = "subVariables";
-            this.subVariables.Size = new System.Drawing.Size(308, 53);
-            this.subVariables.TabIndex = 17;
-            this.subVariables.Text = "Variables";
-            this.subVariables.UseVisualStyleBackColor = true;
-            this.subVariables.Click += new System.EventHandler(this.subMonitorValues_Click);
+            this.menuData.Dock = System.Windows.Forms.DockStyle.Top;
+            this.menuData.Location = new System.Drawing.Point(0, 273);
+            this.menuData.Name = "menuData";
+            this.menuData.Size = new System.Drawing.Size(308, 64);
+            this.menuData.TabIndex = 12;
+            this.menuData.Text = "Data";
+            this.menuData.UseVisualStyleBackColor = true;
+            this.menuData.Click += new System.EventHandler(this.menuData_Click);
             // 
             // menuMonitor
             // 
-            this.menuMonitor.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.menuMonitor.Dock = System.Windows.Forms.DockStyle.Top;
             this.menuMonitor.Location = new System.Drawing.Point(0, 200);
             this.menuMonitor.Name = "menuMonitor";
-            this.menuMonitor.Size = new System.Drawing.Size(308, 59);
-            this.menuMonitor.TabIndex = 12;
+            this.menuMonitor.Size = new System.Drawing.Size(308, 73);
+            this.menuMonitor.TabIndex = 17;
             this.menuMonitor.Text = "Monitor";
             this.menuMonitor.UseVisualStyleBackColor = true;
             this.menuMonitor.Click += new System.EventHandler(this.menuMonitor_Click);
@@ -132,17 +118,17 @@ namespace PlcFxUa
             this.menuBrowse.UseVisualStyleBackColor = true;
             this.menuBrowse.Click += new System.EventHandler(this.menuBrowse_Click);
             // 
-            // menuStart
+            // menuConnect
             // 
-            this.menuStart.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.menuStart.Dock = System.Windows.Forms.DockStyle.Top;
-            this.menuStart.Location = new System.Drawing.Point(0, 75);
-            this.menuStart.Name = "menuStart";
-            this.menuStart.Size = new System.Drawing.Size(308, 56);
-            this.menuStart.TabIndex = 11;
-            this.menuStart.Text = "Connection";
-            this.menuStart.UseVisualStyleBackColor = true;
-            this.menuStart.Click += new System.EventHandler(this.menuStart_Click);
+            this.menuConnect.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.menuConnect.Dock = System.Windows.Forms.DockStyle.Top;
+            this.menuConnect.Location = new System.Drawing.Point(0, 75);
+            this.menuConnect.Name = "menuConnect";
+            this.menuConnect.Size = new System.Drawing.Size(308, 56);
+            this.menuConnect.TabIndex = 11;
+            this.menuConnect.Text = "Connection";
+            this.menuConnect.UseVisualStyleBackColor = true;
+            this.menuConnect.Click += new System.EventHandler(this.menuConnect_Click);
             // 
             // panel2
             // 
@@ -216,8 +202,7 @@ namespace PlcFxUa
         #endregion
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button menuData;
-        private System.Windows.Forms.Button menuMonitor;
-        private System.Windows.Forms.Button menuStart;
+        private System.Windows.Forms.Button menuConnect;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button MenuCalling;
         private System.Windows.Forms.Button menuBrowse;
@@ -225,9 +210,9 @@ namespace PlcFxUa
         public System.Windows.Forms.StatusStrip statusStrip;
         public System.Windows.Forms.ToolStripStatusLabel connectionLabel;
         private System.Windows.Forms.Panel panelChild;
-        private System.Windows.Forms.Button subVariables;
+        private System.Windows.Forms.Button menuMonitor;
         public System.Windows.Forms.ToolStripStatusLabel operationLabel;
-        private System.Windows.Forms.Button subStruct;
+        private System.Windows.Forms.Button menuPID;
     }
 }
 

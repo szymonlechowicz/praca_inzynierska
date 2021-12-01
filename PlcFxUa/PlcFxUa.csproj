@@ -271,13 +271,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BrowsingClass.cs" />
-    <Compile Include="EncDec.cs" />
-    <Compile Include="FormStructure.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormStructure.Designer.cs">
-      <DependentUpon>FormStructure.cs</DependentUpon>
-    </Compile>
     <Compile Include="FormData.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -289,6 +282,12 @@
     </Compile>
     <Compile Include="FormMethod.Designer.cs">
       <DependentUpon>FormMethod.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormPid.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormPid.Designer.cs">
+      <DependentUpon>FormPid.cs</DependentUpon>
     </Compile>
     <Compile Include="MBase.cs" />
     <Compile Include="Measurement.cs" />
@@ -306,11 +305,11 @@
     <Compile Include="FormConnect.Designer.cs">
       <DependentUpon>FormConnect.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormVariables.cs">
+    <Compile Include="FormMonitor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormVariables.Designer.cs">
-      <DependentUpon>FormVariables.cs</DependentUpon>
+    <Compile Include="FormMonitor.Designer.cs">
+      <DependentUpon>FormMonitor.cs</DependentUpon>
     </Compile>
     <Compile Include="FormStart.cs">
       <SubType>Form</SubType>
@@ -318,12 +317,8 @@
     <Compile Include="FormStart.Designer.cs">
       <DependentUpon>FormStart.cs</DependentUpon>
     </Compile>
-    <Compile Include="ObservableListSource.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="FormStructure.resx">
-      <DependentUpon>FormStructure.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="FormBrowse.resx">
       <DependentUpon>FormBrowse.cs</DependentUpon>
     </EmbeddedResource>
@@ -336,8 +331,11 @@
     <EmbeddedResource Include="FormMethod.resx">
       <DependentUpon>FormMethod.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FormVariables.resx">
-      <DependentUpon>FormVariables.cs</DependentUpon>
+    <EmbeddedResource Include="FormPid.resx">
+      <DependentUpon>FormPid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormMonitor.resx">
+      <DependentUpon>FormMonitor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormStart.resx">
       <DependentUpon>FormStart.cs</DependentUpon>

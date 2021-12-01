@@ -46,24 +46,21 @@ namespace PlcFxUa
             childForm.Show();
         }
 
-        private void menuMonitor_Click(object sender, EventArgs e)
-        { 
-            
-        }
-        private void subMonitorValues_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new FormVariables(this, session, context));
-        }
 
-        private void subStruct_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new FormStructure(this, session, context));
-        }
-        private void menuStart_Click(object sender, EventArgs e)
+        private void menuConnect_Click(object sender, EventArgs e)
         {
             OpenChildForm(new FormConnect(this, session, connected, config));
         }
 
+        private void menuMonitor_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new FormMonitor(this, session, context));
+        }
+
+        private void menuPID_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new FormPid(this, session, context));
+        }
         private void menuBrowse_Click(object sender, EventArgs e)
         {
             OpenChildForm(new FormBrowse(this, session));
@@ -105,5 +102,6 @@ namespace PlcFxUa
                 context.Database.ExecuteSqlCommand("Delete from Measurements");
             }
         }
+
     }
 }

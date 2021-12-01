@@ -14,7 +14,7 @@ using System.Threading;
 
 namespace PlcFxUa
 {
-    public partial class FormVariables : Form
+    public partial class FormMonitor : Form
     {
         // TO TRY: Reading more items and changing them
         // TO DO: reading structure: new form?
@@ -26,7 +26,7 @@ namespace PlcFxUa
         private MBase context;
         private NodeId changeableNode;
         private bool firstSelection;
-        public FormVariables(FormStart formStart, Session mainSession, MBase mainContext)
+        public FormMonitor(FormStart formStart, Session mainSession, MBase mainContext)
         {
             InitializeComponent();
 

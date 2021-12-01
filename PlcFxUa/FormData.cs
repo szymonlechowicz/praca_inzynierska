@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using Opc.Ua;
 using Opc.Ua.Client;
 using System.Threading;
@@ -215,7 +216,7 @@ namespace PlcFxUa
             {
                 lineChart.Series.Clear();
                 lineChart.Series.Add("Measure");
-                lineChart.Series["Measure"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                lineChart.Series["Measure"].ChartType = SeriesChartType.Line;
                 double x;
                 foreach (var measurement in measurements)
                 {
@@ -245,7 +246,6 @@ namespace PlcFxUa
             this.print = false;
             lineChart.Series.Clear();
 
-            // drop table/database - TODO
             stopMonitoring = true;
             context.Database.ExecuteSqlCommand("Delete from Measurements");
             this.print = true;
