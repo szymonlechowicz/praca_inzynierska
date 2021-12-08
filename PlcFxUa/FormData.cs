@@ -10,10 +10,10 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using Opc.Ua;
 using Opc.Ua.Client;
-using System.Threading;
 using System.Data.Entity;
 using System.Reflection;
 using System.IO;
+
 
 namespace PlcFxUa
 {
@@ -26,6 +26,10 @@ namespace PlcFxUa
         private MBase context;
         private bool print;
         private bool permToSave;
+        private string nodeId;
+        private string displayName;
+        private System.Windows.Forms.Timer timer;
+        private Reader reader;
         public FormData(FormStart formStart, Session mainSession, MBase mainContext)
         {
             InitializeComponent();
@@ -38,8 +42,10 @@ namespace PlcFxUa
                 treeServer.BeginUpdate();
                 browsing.Populate(ObjectIds.ObjectsFolder, treeServer.Nodes);
                 treeServer.EndUpdate();
-            }
 
+                this.reader = new Reader(this, this.session);
+            }
+            label1.Text = "Select node which you want to see how its value changes in time.\nYou can save measurements in CSV file and open it.";
         }
         private void treeServer_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
@@ -113,21 +119,17 @@ namespace PlcFxUa
                     lineChart.Visible = true;
                     btnResume.Enabled = false;
 
-                    var item = new MonitoredItem(subscription.DefaultItem)
-                    {
-                        DisplayName = rd.DisplayName.ToString(),
-                        StartNodeId = rd.NodeId.ToString(),
-                    };
-                    //var newItem = new Monitored { item = item };
+                    this.nodeId = rd.NodeId.ToString();
+                    this.displayName = rd.DisplayName.ToString();
 
-                    item.Notification += OnNotification;
-                    subscription.AddItem(item);
+                    if (context == null)
+                        context = new MBase();
 
-                    
-                    //context.MonitoredItems.Add(newItem);
 
-                    //currentMonitoredItems.Add(item);
-
+                    this.timer = new Timer();
+                    timer.Interval = 1000;
+                    timer.Tick += new EventHandler(timer_Tick);
+                    timer.Start();
                 }
 
                 subscription.ApplyChanges();
@@ -137,68 +139,6 @@ namespace PlcFxUa
             catch (Exception exc)
             {
                 MessageBox.Show(exc.Message);
-            }
-        }
-
-        private void OnNotification(MonitoredItem item, MonitoredItemNotificationEventArgs e)
-        {
-
-            if (!parent.stopMonitoring)
-            {
-                if (InvokeRequired)
-                {
-                    BeginInvoke(new MonitoredItemNotificationEventHandler(OnNotification), item, e);
-                    return;
-                }
-
-                MonitoredItemNotification data = e.NotificationValue as MonitoredItemNotification;
-
-                if (data == null) return;
-
-                string type = data.Value.WrappedValue.TypeInfo.BuiltInType.ToString();
-                if (data.Value.WrappedValue.TypeInfo.ValueRank >= 0)
-                    type += "[]";
-
-                //nameLabel.Text = item.DisplayName;
-                //MonitorLabel.Text = "Value: " + data.Value.Value +
-                //    "\nDataType: " + type + "\nTime: " + data.Value.SourceTimestamp.ToString() +
-                //    "\n\n If you want, add this to list of monitored items";
-
-                string nodeId = item.StartNodeId.ToString();
-
-                var measurement = new Measurement()
-                {
-                    time = data.Value.SourceTimestamp,
-                    value = data.Value.Value.ToString()
-                };
-
-
-                if (!context.Items.Any(i => i.nodeId == nodeId))
-                {
-                    var monitoredItem = new Item
-                    {
-                        nodeId = nodeId,
-                        displayName = item.DisplayName,
-                        dataType = type,
-                        measurements = new List<Measurement>()
-                    };
-
-                    monitoredItem.measurements.Add(measurement);
-                    context.Items.Add(monitoredItem);
-                }
-                else
-                {
-                    Item monitoredItem = context.Items.FirstOrDefault(i => i.nodeId == nodeId);
-                    monitoredItem.measurements.Add(measurement);
-                }
-
-                context.SaveChanges();
-
-                
-                var itemDB = context.Items.Single(i => i.nodeId == nodeId);
-                var measurements = context.Measurements.Where(m => m.monitoredId == itemDB.ID).ToList();
-                DrawChart(measurements, itemDB.displayName);
-                UpdateParent();
             }
         }
 
@@ -251,6 +191,7 @@ namespace PlcFxUa
             this.print = true;
             treeServer.SelectedNode = null;
             treeServer.Enabled = true;
+            timer = null;
             //this.permToSave = false;
         }
 
@@ -309,6 +250,64 @@ namespace PlcFxUa
                 MessageBox.Show(exc.Message);
             }
             
+        }
+
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            //refresh here...
+            if (!parent.stopMonitoring)
+            {
+                AddToDB(this.reader.ReadTag(this.nodeId)[0], this.nodeId, this.displayName);
+
+                var itemDB = context.Items.Single(i => i.nodeId == this.nodeId);
+                var measurements = context.Measurements.Where(m => m.monitoredId == itemDB.ID).ToList();
+                DrawChart(measurements, itemDB.displayName);
+                UpdateParent();
+
+                subscription.ApplyChanges();
+            }
+            
+        }
+        private void AddToDB(DataValue dataValue, string nodeId, string displayName)
+        {
+            string type = dataValue.WrappedValue.TypeInfo.BuiltInType.ToString();
+            
+            if (dataValue.WrappedValue.TypeInfo.ValueRank >= 0)
+                type += "[]";
+
+
+            var measurement = new Measurement()
+            {
+                time = dataValue.SourceTimestamp,
+                value = dataValue.WrappedValue.ToString()
+            };
+
+
+            if (!context.Items.Any(i => i.nodeId == nodeId))
+            {
+                var monitoredItem = new Item
+                {
+                    nodeId = nodeId,
+                    displayName = displayName,
+                    dataType = type,
+                    measurements = new List<Measurement>()
+                };
+
+                monitoredItem.measurements.Add(measurement);
+                context.Items.Add(monitoredItem);
+            }
+            else
+            {
+                Item monitoredItem = context.Items.FirstOrDefault(i => i.nodeId == nodeId);
+                monitoredItem.measurements.Add(measurement);
+            }
+            context.SaveChanges();
+        }
+
+        private void btnOpen_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data.csv"));
         }
     }
 }

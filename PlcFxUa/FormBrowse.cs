@@ -32,6 +32,9 @@ namespace PlcFxUa
             if (this.session != null)
             {
                 this.browsing = new BrowsingClass(this.session);
+                treeServer.BeginUpdate();
+                browsing.Populate(ObjectIds.ObjectsFolder, treeServer.Nodes);
+                treeServer.EndUpdate();
             }
             if (this.subscription == null)
             {
@@ -42,18 +45,6 @@ namespace PlcFxUa
                 " subscribing node\nby double click on the node.\nNOTICE! On this form monitored\nitem doesn't save to database.";
 
 
-
-            try
-            {
-                treeServer.BeginUpdate();
-                browsing.Populate(ObjectIds.ObjectsFolder, treeServer.Nodes);
-                treeServer.EndUpdate();
-
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message);
-            }
 
         }
         

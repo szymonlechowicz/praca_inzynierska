@@ -35,6 +35,9 @@ namespace PlcFxUa
             this.treeServer = new System.Windows.Forms.TreeView();
             this.outputLV = new System.Windows.Forms.ListView();
             this.inputLV = new System.Windows.Forms.ListView();
+            this.label1 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnCall
@@ -81,7 +84,7 @@ namespace PlcFxUa
             // 
             this.treeServer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.treeServer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(228)))), ((int)(((byte)(255)))), ((int)(((byte)(249)))));
+            this.treeServer.BackColor = System.Drawing.Color.White;
             this.treeServer.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.treeServer.Location = new System.Drawing.Point(25, 25);
             this.treeServer.Name = "treeServer";
@@ -110,12 +113,34 @@ namespace PlcFxUa
             this.inputLV.UseCompatibleStateImageBehavior = false;
             this.inputLV.SelectedIndexChanged += new System.EventHandler(this.inputLV_SelectedIndexChanged);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(14, 25);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(43, 21);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "label";
+            // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(37)))), ((int)(((byte)(67)))));
+            this.panel2.Controls.Add(this.label1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panel2.Location = new System.Drawing.Point(1148, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(252, 600);
+            this.panel2.TabIndex = 10;
+            // 
             // FormMethod
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(199)))), ((int)(((byte)(214)))), ((int)(((byte)(219)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(184)))), ((int)(((byte)(243)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(1400, 600);
+            this.Controls.Add(this.panel2);
             this.Controls.Add(this.treeServer);
             this.Controls.Add(this.btnModify);
             this.Controls.Add(this.modifyTB);
@@ -125,6 +150,8 @@ namespace PlcFxUa
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormMethod";
             this.Text = "FormMethod";
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -137,5 +164,7 @@ namespace PlcFxUa
         private System.Windows.Forms.TreeView treeServer;
         private System.Windows.Forms.ListView outputLV;
         private System.Windows.Forms.ListView inputLV;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel panel2;
     }
 }

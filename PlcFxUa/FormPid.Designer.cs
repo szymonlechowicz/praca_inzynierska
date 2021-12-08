@@ -38,11 +38,9 @@ namespace PlcFxUa
             this.inputChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.outputChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.runBtn = new System.Windows.Forms.RadioButton();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.btnRun = new System.Windows.Forms.Button();
             this.helpLabel = new System.Windows.Forms.Label();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnPause = new System.Windows.Forms.Button();
-            this.btnResume = new System.Windows.Forms.Button();
             this.tdLbl = new System.Windows.Forms.Label();
             this.xpLbl = new System.Windows.Forms.Label();
             this.tiLbl = new System.Windows.Forms.Label();
@@ -55,9 +53,15 @@ namespace PlcFxUa
             this.minTB = new System.Windows.Forms.TextBox();
             this.maxLbl = new System.Windows.Forms.Label();
             this.maxTB = new System.Windows.Forms.TextBox();
+            this.btnOpen = new System.Windows.Forms.Button();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.btnStop = new System.Windows.Forms.Button();
+            this.btnPause = new System.Windows.Forms.Button();
+            this.btnResume = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.inputChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.outputChart)).BeginInit();
             this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // inputChart
@@ -118,11 +122,10 @@ namespace PlcFxUa
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.runBtn);
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(184)))), ((int)(((byte)(243)))), ((int)(((byte)(255)))));
+            this.panel1.Controls.Add(this.panel2);
+            this.panel1.Controls.Add(this.btnRun);
             this.panel1.Controls.Add(this.helpLabel);
-            this.panel1.Controls.Add(this.btnSave);
-            this.panel1.Controls.Add(this.btnPause);
-            this.panel1.Controls.Add(this.btnResume);
             this.panel1.Controls.Add(this.tdLbl);
             this.panel1.Controls.Add(this.xpLbl);
             this.panel1.Controls.Add(this.tiLbl);
@@ -141,18 +144,29 @@ namespace PlcFxUa
             this.panel1.Size = new System.Drawing.Size(391, 600);
             this.panel1.TabIndex = 23;
             // 
-            // runBtn
+            // panel2
             // 
-            this.runBtn.Appearance = System.Windows.Forms.Appearance.Button;
-            this.runBtn.AutoSize = true;
-            this.runBtn.Location = new System.Drawing.Point(162, 344);
-            this.runBtn.Name = "runBtn";
-            this.runBtn.Size = new System.Drawing.Size(44, 27);
-            this.runBtn.TabIndex = 39;
-            this.runBtn.TabStop = true;
-            this.runBtn.Text = "Run";
-            this.runBtn.UseVisualStyleBackColor = true;
-            this.runBtn.CheckedChanged += new System.EventHandler(this.runBtn_CheckedChanged);
+            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(37)))), ((int)(((byte)(67)))));
+            this.panel2.Controls.Add(this.btnOpen);
+            this.panel2.Controls.Add(this.btnSave);
+            this.panel2.Controls.Add(this.btnStop);
+            this.panel2.Controls.Add(this.btnPause);
+            this.panel2.Controls.Add(this.btnResume);
+            this.panel2.Location = new System.Drawing.Point(29, 488);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(335, 75);
+            this.panel2.TabIndex = 42;
+            // 
+            // btnRun
+            // 
+            this.btnRun.Location = new System.Drawing.Point(168, 339);
+            this.btnRun.Name = "btnRun";
+            this.btnRun.Size = new System.Drawing.Size(75, 23);
+            this.btnRun.TabIndex = 41;
+            this.btnRun.Text = "Run";
+            this.btnRun.UseVisualStyleBackColor = true;
+            this.btnRun.Click += new System.EventHandler(this.btnRun_Click);
             // 
             // helpLabel
             // 
@@ -162,36 +176,6 @@ namespace PlcFxUa
             this.helpLabel.Size = new System.Drawing.Size(46, 17);
             this.helpLabel.TabIndex = 38;
             this.helpLabel.Text = "label1";
-            // 
-            // btnSave
-            // 
-            this.btnSave.Location = new System.Drawing.Point(258, 520);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(106, 23);
-            this.btnSave.TabIndex = 37;
-            this.btnSave.Text = "Save to CSV";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
-            // btnPause
-            // 
-            this.btnPause.Location = new System.Drawing.Point(150, 520);
-            this.btnPause.Name = "btnPause";
-            this.btnPause.Size = new System.Drawing.Size(75, 23);
-            this.btnPause.TabIndex = 36;
-            this.btnPause.Text = "Pause";
-            this.btnPause.UseVisualStyleBackColor = true;
-            this.btnPause.Click += new System.EventHandler(this.btnPause_Click);
-            // 
-            // btnResume
-            // 
-            this.btnResume.Location = new System.Drawing.Point(44, 520);
-            this.btnResume.Name = "btnResume";
-            this.btnResume.Size = new System.Drawing.Size(75, 23);
-            this.btnResume.TabIndex = 35;
-            this.btnResume.Text = "Resume";
-            this.btnResume.UseVisualStyleBackColor = true;
-            this.btnResume.Click += new System.EventHandler(this.btnResume_Click);
             // 
             // tdLbl
             // 
@@ -307,11 +291,71 @@ namespace PlcFxUa
             this.maxTB.Tag = "0";
             this.maxTB.KeyDown += new System.Windows.Forms.KeyEventHandler(this.maxTB_KeyDown);
             // 
+            // btnOpen
+            // 
+            this.btnOpen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
+            this.btnOpen.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnOpen.Image = global::PlcFxUa.Properties.Resources.csv_32;
+            this.btnOpen.Location = new System.Drawing.Point(270, 10);
+            this.btnOpen.Name = "btnOpen";
+            this.btnOpen.Size = new System.Drawing.Size(55, 55);
+            this.btnOpen.TabIndex = 13;
+            this.btnOpen.UseVisualStyleBackColor = false;
+            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+            // 
+            // btnSave
+            // 
+            this.btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
+            this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnSave.Image = global::PlcFxUa.Properties.Resources.save_32;
+            this.btnSave.Location = new System.Drawing.Point(205, 10);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(55, 55);
+            this.btnSave.TabIndex = 12;
+            this.btnSave.UseVisualStyleBackColor = false;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnStop
+            // 
+            this.btnStop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
+            this.btnStop.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnStop.Image = global::PlcFxUa.Properties.Resources.stop_32;
+            this.btnStop.Location = new System.Drawing.Point(140, 10);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(55, 55);
+            this.btnStop.TabIndex = 11;
+            this.btnStop.UseVisualStyleBackColor = false;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            // 
+            // btnPause
+            // 
+            this.btnPause.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
+            this.btnPause.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnPause.Image = global::PlcFxUa.Properties.Resources.pause_32;
+            this.btnPause.Location = new System.Drawing.Point(75, 10);
+            this.btnPause.Name = "btnPause";
+            this.btnPause.Size = new System.Drawing.Size(55, 55);
+            this.btnPause.TabIndex = 10;
+            this.btnPause.UseVisualStyleBackColor = false;
+            this.btnPause.Click += new System.EventHandler(this.btnPause_Click);
+            // 
+            // btnResume
+            // 
+            this.btnResume.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
+            this.btnResume.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnResume.Image = global::PlcFxUa.Properties.Resources.play_32;
+            this.btnResume.Location = new System.Drawing.Point(10, 10);
+            this.btnResume.Name = "btnResume";
+            this.btnResume.Size = new System.Drawing.Size(55, 55);
+            this.btnResume.TabIndex = 9;
+            this.btnResume.UseVisualStyleBackColor = false;
+            this.btnResume.Click += new System.EventHandler(this.btnResume_Click);
+            // 
             // FormPid
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(199)))), ((int)(((byte)(214)))), ((int)(((byte)(219)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(184)))), ((int)(((byte)(243)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(1400, 600);
             this.Controls.Add(this.outputChart);
             this.Controls.Add(this.inputChart);
@@ -324,6 +368,7 @@ namespace PlcFxUa
             ((System.ComponentModel.ISupportInitialize)(this.outputChart)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -332,11 +377,7 @@ namespace PlcFxUa
         private System.Windows.Forms.DataVisualization.Charting.Chart inputChart;
         private System.Windows.Forms.DataVisualization.Charting.Chart outputChart;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.RadioButton runBtn;
         private System.Windows.Forms.Label helpLabel;
-        private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.Button btnPause;
-        private System.Windows.Forms.Button btnResume;
         private System.Windows.Forms.Label tdLbl;
         private System.Windows.Forms.Label xpLbl;
         private System.Windows.Forms.Label tiLbl;
@@ -349,5 +390,12 @@ namespace PlcFxUa
         private System.Windows.Forms.TextBox minTB;
         private System.Windows.Forms.Label maxLbl;
         private System.Windows.Forms.TextBox maxTB;
+        private System.Windows.Forms.Button btnRun;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button btnOpen;
+        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnStop;
+        private System.Windows.Forms.Button btnPause;
+        private System.Windows.Forms.Button btnResume;
     }
 }

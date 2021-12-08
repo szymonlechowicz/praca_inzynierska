@@ -41,6 +41,9 @@ namespace PlcFxUa
             this.firstSelection = true;
             if (this.context != null)
                 CreateView();
+            label1.Text = "Select node to monitor by single click on treeview. You can change the value of node\n" +
+                "by single click on value and by change value in the textbox next to button 'Modify'.\n" +
+                "NOTICE! If you delete monitored item from the list, you delete it as well from database";
         }
 
         private void treeServer_BeforeExpand(object sender, TreeViewCancelEventArgs e)

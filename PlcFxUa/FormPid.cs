@@ -10,7 +10,6 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using Opc.Ua;
 using Opc.Ua.Client;
-using System.Threading;
 using System.Data.Entity;
 using System.Reflection;
 using System.IO;
@@ -28,7 +27,9 @@ namespace PlcFxUa
         private string[] dataIds = new string[2];
         private string[] dataNames = new string[2];
         private bool print;
+        private Reader reader;
         private Writer writer;
+        private System.Windows.Forms.Timer timer;
 
         public FormPid(FormStart formStart, Session mainSession, MBase mainContext)
         {
@@ -39,6 +40,7 @@ namespace PlcFxUa
             this.session = mainSession;
             if (this.session != null)
             {
+                this.reader = new Reader(this, this.session);
                 this.writer = new Writer(this.session, this.parent);
             }
 
@@ -136,7 +138,7 @@ namespace PlcFxUa
 
 
             DataValueCollection dataValues = new DataValueCollection();
-            dataValues = ReadTags(this.settingIds);
+            dataValues = this.reader.ReadTags(this.settingIds);
 
             maxTB.Text = dataValues[0].Value.ToString();
             minTB.Text = dataValues[1].Value.ToString();
@@ -156,47 +158,7 @@ namespace PlcFxUa
             subscription.ApplyChanges();
             UpdateParent();
         }
-        private void runBtn_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                print = true;
-                if (context == null)
-                    context = new MBase();
-
-                var item = new MonitoredItem()
-                {
-                    DisplayName = dataIds[0],
-                    StartNodeId = dataNames[0]
-                };
-                item.Notification += OnNotification;
-                subscription.AddItem(item);
-
-
-                //var item2 = new MonitoredItem()
-                //{
-                //    DisplayName = dataIds[1],
-                //    StartNodeId = dataNames[1]
-                //};
-                //item2.Notification += OnNotification;
-                //subscription.AddItem(item2);
-
-
-                subscription.ApplyChanges();
-                UpdateParent();
-
-                maxTB.Enabled = false;
-                minTB.Enabled = false;
-                tiTB.Enabled = false;
-                xpTB.Enabled = false;
-                tdTB.Enabled = false;
-                kTB.Enabled = false;
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
-            }   
-        }
+        
 
         private void maxTB_KeyDown(object sender, KeyEventArgs e)
         {
@@ -288,87 +250,7 @@ namespace PlcFxUa
 
         }
         #endregion
-        private ReadValueId AddNode(string nodeId)
-        {
-            ReadValueId readValue = new ReadValueId();
-            readValue.NodeId = nodeId;
-            readValue.AttributeId = Attributes.Value;
-
-            return readValue;
-        }
-        private DataValueCollection ReadTags(string[] ids)
-        {
-            ReadValueIdCollection readValues = new ReadValueIdCollection();
-            foreach (var id in ids)
-            {
-                readValues.Add(AddNode(id));
-            }
-
-            return ReadDataValues(readValues);
-        }
-        private DataValueCollection ReadTag(string id)
-        {
-            ReadValueIdCollection readValues = new ReadValueIdCollection();
-            readValues.Add(AddNode(id));
-
-            return ReadDataValues(readValues);
-        }
-        private DataValueCollection ReadDataValues(ReadValueIdCollection readValues)
-        {
-            DataValueCollection results = null;
-            DiagnosticInfoCollection diagnosticInfos = null;
-
-            this.session.Read(null, Double.MaxValue, TimestampsToReturn.Both, readValues, out results, out diagnosticInfos);
-
-            ClientBase.ValidateResponse(results, readValues);
-            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, readValues);
-
-            if (DataValue.IsBad(results[0]))
-            {
-                throw new ServiceResultException("Error");
-            }
-
-            DialogResult = DialogResult.OK;
-
-            return results;
-        }
-        private void OnNotification(MonitoredItem item, MonitoredItemNotificationEventArgs e)
-        {
-            if (!parent.stopMonitoring)
-            {
-                try
-                {
-                    if (InvokeRequired)
-                    {
-                        BeginInvoke(new MonitoredItemNotificationEventHandler(OnNotification), item, e);
-                        return;
-                    }
-
-                    MonitoredItemNotification data = e.NotificationValue as MonitoredItemNotification;
-
-                    if (data == null) return;
-
-                    string nodeId = item.StartNodeId.ToString();
-                    string displayName = item.DisplayName;
-
-                    AddToDB(data.Value, nodeId, displayName);
-
-                    var itemDB = context.Items.Single(i => i.nodeId == nodeId);
-                    var measurements = context.Measurements.Where(m => m.monitoredId == itemDB.ID).ToList();
-
-                    if (nodeId == dataIds[0])
-                        DrawChart(inputChart, measurements, dataNames[0]);
-                    else DrawChart(outputChart, measurements, dataNames[1]);
-                    UpdateParent();
-                }
-
-                catch (Exception exc)
-                {
-                    MessageBox.Show(exc.Message);
-                }
-            }
-            
-        }
+        
         private void AddToDB(DataValue dataValue, string nodeId, string displayName)
         {
             string type = dataValue.WrappedValue.TypeInfo.BuiltInType.ToString();
@@ -479,7 +361,7 @@ namespace PlcFxUa
 
 
             DataValueCollection dataValues = new DataValueCollection();
-            dataValues = ReadTag(nodeToWrite);
+            dataValues = this.reader.ReadTag(nodeToWrite);
 
             textBox.Text = dataValues[0].Value.ToString();
 
@@ -493,51 +375,82 @@ namespace PlcFxUa
             UpdateParent();
         }
 
-        private void runBtn_CheckedChanged(object sender, EventArgs e)
+
+        private void btnStop_Click(object sender, EventArgs e)
         {
-            if (runBtn.Checked)
+            this.print = false;
+            inputChart.Series.Clear();
+            outputChart.Series.Clear();
+
+            parent.stopMonitoring = true;
+            this.print = true;
+            timer = null;
+
+            maxTB.Enabled = true;
+            minTB.Enabled = true;
+            tiTB.Enabled = true;
+            xpTB.Enabled = true;
+            tdTB.Enabled = true;
+            kTB.Enabled = true;
+        }
+
+        private void btnRun_Click(object sender, EventArgs e)
+        {
+            try
             {
-                try
-                {
-                    parent.stopMonitoring = false;
-                    print = true;
-                    if (context == null)
-                        context = new MBase();
+                parent.stopMonitoring = false;
+                print = true;
+                if (context == null)
+                    context = new MBase();
 
-                    var item = new MonitoredItem()
-                    {
-                        DisplayName = dataNames[0],
-                        StartNodeId = dataIds[0]
-                    };
-                    item.Notification += OnNotification;
-                    subscription.AddItem(item);
+                this.timer = new Timer();
+                timer.Interval = 1000;
+                timer.Tick += new EventHandler(timer_Tick);
+                timer.Start();
 
+                subscription.ApplyChanges();
+                UpdateParent();
 
-                    var item2 = new MonitoredItem()
-                    {
-                        DisplayName = dataNames[1],
-                        StartNodeId = dataIds[1]
-                    };
-                    item2.Notification += OnNotification;
-                    subscription.AddItem(item2);
-
-
-                    subscription.ApplyChanges();
-                    UpdateParent();
-
-                    maxTB.Enabled = false;
-                    minTB.Enabled = false;
-                    tiTB.Enabled = false;
-                    xpTB.Enabled = false;
-                    tdTB.Enabled = false;
-                    kTB.Enabled = false;
-                }
-                catch (Exception exc)
-                {
-                    MessageBox.Show(exc.Message);
-                }
+                maxTB.Enabled = false;
+                minTB.Enabled = false;
+                tiTB.Enabled = false;
+                xpTB.Enabled = false;
+                tdTB.Enabled = false;
+                kTB.Enabled = false;
             }
-                
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            //refresh here...
+            if (!parent.stopMonitoring)
+            {
+                ReadAndDraw(dataIds[0], dataNames[0], inputChart);
+                ReadAndDraw(dataIds[1], dataNames[1], outputChart);
+
+                UpdateParent();
+
+                subscription.ApplyChanges();
+            }
+        }
+
+        private void ReadAndDraw(string nodeId, string displayName, Chart chart)
+        {
+            AddToDB(this.reader.ReadTag(nodeId)[0], nodeId, displayName);
+
+
+            var item = context.Items.Single(i => i.nodeId == nodeId);
+            var measurements = context.Measurements.Where(m => m.monitoredId == item.ID).ToList();
+            DrawChart(chart, measurements, item.displayName);
+        }
+
+        private void btnOpen_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data.csv"));
         }
     }
 }

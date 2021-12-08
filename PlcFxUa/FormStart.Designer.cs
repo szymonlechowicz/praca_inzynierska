@@ -29,6 +29,7 @@ namespace PlcFxUa
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormStart));
             this.panel1 = new System.Windows.Forms.Panel();
             this.menuPID = new System.Windows.Forms.Button();
             this.MenuCalling = new System.Windows.Forms.Button();
@@ -41,8 +42,8 @@ namespace PlcFxUa
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.connectionLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.operationLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.panelChild = new System.Windows.Forms.Panel();
             this.databaseBtn = new System.Windows.Forms.ToolStripSplitButton();
+            this.panelChild = new System.Windows.Forms.Panel();
             this.panel1.SuspendLayout();
             this.panelStatus.SuspendLayout();
             this.statusStrip.SuspendLayout();
@@ -51,7 +52,7 @@ namespace PlcFxUa
             // panel1
             // 
             this.panel1.AutoScroll = true;
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(45)))), ((int)(((byte)(66)))));
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(37)))), ((int)(((byte)(67)))));
             this.panel1.Controls.Add(this.menuPID);
             this.panel1.Controls.Add(this.MenuCalling);
             this.panel1.Controls.Add(this.menuData);
@@ -159,6 +160,7 @@ namespace PlcFxUa
             // 
             // panel2
             // 
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(37)))), ((int)(((byte)(67)))));
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
@@ -176,7 +178,7 @@ namespace PlcFxUa
             // 
             // statusStrip
             // 
-            this.statusStrip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(45)))), ((int)(((byte)(66)))));
+            this.statusStrip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(37)))), ((int)(((byte)(67)))));
             this.statusStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.connectionLabel,
@@ -202,21 +204,11 @@ namespace PlcFxUa
             this.operationLabel.Size = new System.Drawing.Size(151, 20);
             this.operationLabel.Text = "toolStripStatusLabel1";
             // 
-            // panelChild
-            // 
-            this.panelChild.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(199)))), ((int)(((byte)(214)))), ((int)(((byte)(219)))));
-            this.panelChild.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelChild.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.panelChild.Location = new System.Drawing.Point(300, 0);
-            this.panelChild.Name = "panelChild";
-            this.panelChild.Size = new System.Drawing.Size(1400, 600);
-            this.panelChild.TabIndex = 12;
-            // 
             // databaseBtn
             // 
             this.databaseBtn.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.databaseBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.databaseBtn.Image = global::PlcFxUa.Properties.Resources.pobrane;
+            this.databaseBtn.Image = global::PlcFxUa.Properties.Resources.delete_database_32;
             this.databaseBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.databaseBtn.Name = "databaseBtn";
             this.databaseBtn.Size = new System.Drawing.Size(39, 24);
@@ -224,17 +216,28 @@ namespace PlcFxUa
             this.databaseBtn.ToolTipText = "Delete from database";
             this.databaseBtn.ButtonClick += new System.EventHandler(this.databaseBtn_ButtonClick);
             // 
+            // panelChild
+            // 
+            this.panelChild.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(184)))), ((int)(((byte)(243)))), ((int)(((byte)(255)))));
+            this.panelChild.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelChild.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.panelChild.Location = new System.Drawing.Point(300, 0);
+            this.panelChild.Name = "panelChild";
+            this.panelChild.Size = new System.Drawing.Size(1400, 600);
+            this.panelChild.TabIndex = 12;
+            // 
             // FormStart
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(199)))), ((int)(((byte)(214)))), ((int)(((byte)(219)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(184)))), ((int)(((byte)(243)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(1700, 630);
             this.Controls.Add(this.panelChild);
             this.Controls.Add(this.panelStatus);
             this.Controls.Add(this.panel1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormStart";
-            this.Text = "PLC-OPC";
+            this.Text = "OPC UA Client";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormStart_FormClosing);
             this.Load += new System.EventHandler(this.FormStart_Load);
             this.panel1.ResumeLayout(false);

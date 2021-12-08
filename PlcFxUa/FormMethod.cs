@@ -20,7 +20,6 @@ namespace PlcFxUa
         private BrowsingClass browsing;
         private NodeId methodId;
         private NodeId objectId;
-        private Writer writer;
 
         public FormMethod()
         {
@@ -36,7 +35,6 @@ namespace PlcFxUa
             if (this.session != null)
             {
                 this.browsing = new BrowsingClass(this.session);
-                this.writer = new Writer(this.session, this.parent);
                 treeServer.BeginUpdate();
                 browsing.Populate(ObjectIds.ObjectsFolder, treeServer.Nodes);
                 treeServer.EndUpdate();
@@ -61,6 +59,11 @@ namespace PlcFxUa
             outputLV.Columns.Add("DataType", 100);
             outputLV.Columns.Add("Value", 100);
             outputLV.Columns.Add("Description", 100);
+
+            label1.Text = "Browse server to find wanted\nmethod to call." +
+                "Once you\nclick on the node,\ninput arguments will be\nseen in listview." +
+                "To change\nvalue of argument, click\nthe value and edit it in\ntextbox under listview.\n" +
+                "Then click button 'Call' to\ncall the method.";
         }
 
         private void UpdateParent()

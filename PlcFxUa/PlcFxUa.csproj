@@ -319,6 +319,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Reader.cs" />
     <Compile Include="Writer.cs" />
     <EmbeddedResource Include="FormBrowse.resx">
       <DependentUpon>FormBrowse.cs</DependentUpon>
@@ -343,14 +349,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <None Include="packages.config" />
     <None Include="Properties\DataSources\FormMonitor.datasource" />
     <None Include="Properties\DataSources\FormStart.datasource" />
@@ -386,10 +387,25 @@
     <None Include="Resources\opc_ua.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\play.png" />
+    <None Include="Resources\pause-32.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\pobrane.png" />
+    <None Include="Resources\play-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\stop-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\save-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\csv-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\delete-database-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\opc_ua_png.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

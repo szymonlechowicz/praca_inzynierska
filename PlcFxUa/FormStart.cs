@@ -117,6 +117,7 @@ namespace PlcFxUa
                 context.Database.ExecuteSqlCommand("Delete from Measurements");
                 MessageBox.Show("Database clear");
             }
+            else MessageBox.Show("No context");
         }
 
         private void FormStart_Load(object sender, EventArgs e)
