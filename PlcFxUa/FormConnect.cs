@@ -31,6 +31,8 @@ namespace PlcFxUa
         {
             InitializeComponent();
 
+            BtnConnect.Size = BtnDisconnect.Size;
+
             this.parent = formStart;
             this.session = mainSession;
             this.connected = mainConnected;
@@ -166,14 +168,12 @@ namespace PlcFxUa
 
         private void FormConnect_Load(object sender, EventArgs e)
         {
-            if(session == null)
-            {
-                TextConn.Text = "Session is null";
-            }
-            else if (session != null || connected)
-            {
-                TextConn.Text = "OK";
-            }
+            
+        }
+
+        private void EditUrl_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

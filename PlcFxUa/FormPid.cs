@@ -28,31 +28,85 @@ namespace PlcFxUa
         private string[] dataIds = new string[2];
         private string[] dataNames = new string[2];
         private bool print;
+        private Writer writer;
 
-        public FormPid()
-        {
-            InitializeComponent();
-        }
         public FormPid(FormStart formStart, Session mainSession, MBase mainContext)
         {
             InitializeComponent();
 
+            helpLabel.Text = "";
             this.parent = formStart;
             this.session = mainSession;
-            this.context = mainContext;
-            
-            for (int i = 0; i < 6; i++)
+            if (this.session != null)
             {
-                settingIds[i] = "";
-                settingNames[i] = "";
+                this.writer = new Writer(this.session, this.parent);
             }
-            for (int i = 0; i < 2; i++)
-            {
-                dataIds[i] = "";
-                dataNames[i] = "";
-            }
-        }
 
+            this.context = mainContext;
+
+            settingIds[0] = "ns=2;i=10220";
+            settingNames[0] = "UInt16Value";
+
+            settingIds[1] = "ns=2;i=10222";
+            settingNames[1] = "UInt32Value";
+
+            settingIds[2] = "ns=2;i=10848";
+            settingNames[2] = "UInt16Value";
+
+            settingIds[3] = "ns=2;i=10850";
+            settingNames[3] = "UInt32Value";
+
+            settingIds[4] = "ns=2;i=10852";
+            settingNames[4] = "UInt64Value";
+
+            settingIds[5] = "ns=2;i=10224";
+            settingNames[5] = "UInt64Value";
+
+            dataIds[0] = "ns=2;i=10850";
+            dataNames[0] = "UInt32Value";
+
+            dataIds[1] = "ns=2;i=10852";
+            dataNames[1] = "UInt64Value";
+
+
+            //settingIds[0] = "ns=4;i=44";
+            //settingNames[0] = "InputLowerLimit";
+
+            //settingIds[1] = "ns=4;i=45";
+            //settingNames[1] = "InputUpperLimit";
+
+            //settingIds[2] = "ns=4;i=103";
+            //settingNames[2] = "Gain";
+
+            //settingIds[3] = "ns=4;i=104";
+            //settingNames[3] = "Ti";
+
+            //settingIds[4] = "ns=4;i=105";
+            //settingNames[4] = "Td";
+
+            //settingIds[5] = "ns=4;i=129";
+            //settingNames[5] = "wartosc_zadana";
+
+            //dataIds[0] = "ns=4;i=130";
+            //dataNames[0] = "scaled_input";
+
+            //dataIds[1] = "ns=4;i=131";
+            //dataNames[1] = "real_output";
+
+            //for (int i = 0; i < 6; i++)
+            //{
+            //    settingIds[i] = "";
+            //    settingNames[i] = "";
+            //}
+            //for (int i = 0; i < 2; i++)
+            //{
+            //    dataIds[i] = "";
+            //    dataNames[i] = "";
+            //}
+
+
+        }
+        #region Control Events
         private void FormPid_Load(object sender, EventArgs e)
         {
             if (session == null || !session.Connected)
@@ -82,7 +136,7 @@ namespace PlcFxUa
 
 
             DataValueCollection dataValues = new DataValueCollection();
-            dataValues = ReadTags();
+            dataValues = ReadTags(this.settingIds);
 
             maxTB.Text = dataValues[0].Value.ToString();
             minTB.Text = dataValues[1].Value.ToString();
@@ -104,25 +158,136 @@ namespace PlcFxUa
         }
         private void runBtn_Click(object sender, EventArgs e)
         {
-            print = true;
-            if (context == null)
-                context = new MBase();
-
-            for (int i = 0; i < 2; i++)
+            try
             {
+                print = true;
+                if (context == null)
+                    context = new MBase();
+
                 var item = new MonitoredItem()
                 {
-                    DisplayName = dataIds[i],
-                    StartNodeId = dataNames[i]
+                    DisplayName = dataIds[0],
+                    StartNodeId = dataNames[0]
                 };
                 item.Notification += OnNotification;
                 subscription.AddItem(item);
-            }
 
-            subscription.ApplyChanges();
-            UpdateParent();
+
+                //var item2 = new MonitoredItem()
+                //{
+                //    DisplayName = dataIds[1],
+                //    StartNodeId = dataNames[1]
+                //};
+                //item2.Notification += OnNotification;
+                //subscription.AddItem(item2);
+
+
+                subscription.ApplyChanges();
+                UpdateParent();
+
+                maxTB.Enabled = false;
+                minTB.Enabled = false;
+                tiTB.Enabled = false;
+                xpTB.Enabled = false;
+                tdTB.Enabled = false;
+                kTB.Enabled = false;
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }   
         }
 
+        private void maxTB_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                WriteAndRead(0, maxTB);
+            }
+        }
+
+
+        private void minTB_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                WriteAndRead(1, minTB);
+
+            }
+        }
+        
+        private void kTB_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                WriteAndRead(2, kTB);
+            }
+        }
+
+        private void tiTB_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                WriteAndRead(3, tiTB);
+            }
+        }
+
+        private void tdTB_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                WriteAndRead(4, tdTB);
+            }
+        }
+
+        private void xpTB_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                WriteAndRead(5, xpTB);
+            }
+        }
+        private void btnPause_Click(object sender, EventArgs e)
+        {
+            this.print = false;
+            btnResume.Enabled = true;
+            btnPause.Enabled = false;
+
+            maxTB.Enabled = true;
+            minTB.Enabled = true;
+            tiTB.Enabled = true;
+            xpTB.Enabled = true;
+            tdTB.Enabled = true;
+            kTB.Enabled = true;
+        }
+
+        private void btnResume_Click(object sender, EventArgs e)
+        {
+            this.print = true;
+            btnPause.Enabled = true;
+            btnResume.Enabled = false;
+
+            maxTB.Enabled = false;
+            minTB.Enabled = false;
+            tiTB.Enabled = false;
+            xpTB.Enabled = false;
+            tdTB.Enabled = false;
+            kTB.Enabled = false;
+        }
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            context.Items.Load();
+            context.Measurements.Load();
+            for (int index = 0; index < 2; index++)
+            {
+                var item = context.Items.Single(i => i.nodeId == dataIds[index]);
+                var measurements = context.Measurements.Where(m => m.monitoredId == item.ID).ToList();
+
+                ExportCSV(measurements, dataNames[index]);
+            }
+
+        }
+        #endregion
         private ReadValueId AddNode(string nodeId)
         {
             ReadValueId readValue = new ReadValueId();
@@ -131,21 +296,30 @@ namespace PlcFxUa
 
             return readValue;
         }
-        private DataValueCollection ReadTags()
+        private DataValueCollection ReadTags(string[] ids)
         {
             ReadValueIdCollection readValues = new ReadValueIdCollection();
-            readValues.Add(AddNode(settingIds[0]));
-            readValues.Add(AddNode(settingIds[1]));
-            readValues.Add(AddNode(settingIds[2]));
-            readValues.Add(AddNode(settingIds[3]));
-            readValues.Add(AddNode(settingIds[4]));
-            readValues.Add(AddNode(settingIds[5]));
+            foreach (var id in ids)
+            {
+                readValues.Add(AddNode(id));
+            }
 
+            return ReadDataValues(readValues);
+        }
+        private DataValueCollection ReadTag(string id)
+        {
+            ReadValueIdCollection readValues = new ReadValueIdCollection();
+            readValues.Add(AddNode(id));
+
+            return ReadDataValues(readValues);
+        }
+        private DataValueCollection ReadDataValues(ReadValueIdCollection readValues)
+        {
             DataValueCollection results = null;
             DiagnosticInfoCollection diagnosticInfos = null;
 
             this.session.Read(null, Double.MaxValue, TimestampsToReturn.Both, readValues, out results, out diagnosticInfos);
-            
+
             ClientBase.ValidateResponse(results, readValues);
             ClientBase.ValidateDiagnosticInfos(diagnosticInfos, readValues);
 
@@ -158,33 +332,42 @@ namespace PlcFxUa
 
             return results;
         }
-        private void OnNotification(MonitoredItem monitoredItem, MonitoredItemNotificationEventArgs e)
+        private void OnNotification(MonitoredItem item, MonitoredItemNotificationEventArgs e)
         {
-            try
+            if (!parent.stopMonitoring)
             {
-                if (InvokeRequired)
+                try
                 {
-                    BeginInvoke(new MonitoredItemNotificationEventHandler(OnNotification), monitoredItem, e);
-                    return;
+                    if (InvokeRequired)
+                    {
+                        BeginInvoke(new MonitoredItemNotificationEventHandler(OnNotification), item, e);
+                        return;
+                    }
+
+                    MonitoredItemNotification data = e.NotificationValue as MonitoredItemNotification;
+
+                    if (data == null) return;
+
+                    string nodeId = item.StartNodeId.ToString();
+                    string displayName = item.DisplayName;
+
+                    AddToDB(data.Value, nodeId, displayName);
+
+                    var itemDB = context.Items.Single(i => i.nodeId == nodeId);
+                    var measurements = context.Measurements.Where(m => m.monitoredId == itemDB.ID).ToList();
+
+                    if (nodeId == dataIds[0])
+                        DrawChart(inputChart, measurements, dataNames[0]);
+                    else DrawChart(outputChart, measurements, dataNames[1]);
+                    UpdateParent();
                 }
 
-                MonitoredItemNotification data = e.NotificationValue as MonitoredItemNotification;
-
-                if (data == null) return;
-                AddToDB(data.Value, monitoredItem.StartNodeId.ToString(), monitoredItem.DisplayName);
-                
-                var item = context.Items.Single(i => i.nodeId == monitoredItem.StartNodeId.ToString());
-                var measurements = context.Measurements.Where(m => m.monitoredId == item.ID).ToList();
-                
-                if (monitoredItem.StartNodeId.ToString() == dataIds[0])
-                    DrawChart(inputChart, measurements);
-                else DrawChart(outputChart, measurements);
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message);
+                }
             }
-
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
-            }
+            
         }
         private void AddToDB(DataValue dataValue, string nodeId, string displayName)
         {
@@ -212,30 +395,29 @@ namespace PlcFxUa
 
                 monitoredItem.measurements.Add(measurement);
                 context.Items.Add(monitoredItem);
-                context.SaveChanges();
             }
             else
             {
                 Item monitoredItem = context.Items.FirstOrDefault(i => i.nodeId == nodeId);
                 monitoredItem.measurements.Add(measurement);
-                context.SaveChanges();
             }
+            context.SaveChanges();
         }
-        private void DrawChart(Chart chart, List<Measurement> measurements)
+        private void DrawChart(Chart chart, List<Measurement> measurements, string seriesName)
         {
             if (print)
             {
                 chart.Series.Clear();
-                chart.Series.Add("Measure");
-                chart.Series["Measure"].ChartType = SeriesChartType.Line;
+                chart.Series.Add(seriesName);
+                chart.Series[seriesName].ChartType = SeriesChartType.Line;
                 double x;
                 foreach (var measurement in measurements)
                 {
                     x = (measurement.time.Ticks - measurement.time.Ticks) / 10000000;
-                    chart.Series["Measure"].Points.AddXY(x, Convert.ToDouble(measurement.value));
+                    chart.Series[seriesName].Points.AddXY(x, Convert.ToDouble(measurement.value));
                 }
             }
-            
+            else return;
         }
 
         private void UpdateParent()
@@ -243,32 +425,7 @@ namespace PlcFxUa
             parent.GetSession(session);
             parent.GetDB(context);
         }
-        private void btnPause_Click(object sender, EventArgs e)
-        {
-            this.print = false;
-            btnResume.Enabled = true;
-            btnPause.Enabled = false;
-        }
-
-        private void btnResume_Click(object sender, EventArgs e)
-        {
-            this.print = true;
-            btnPause.Enabled = true;
-            btnResume.Enabled = false;
-        }
-        private void btnSave_Click(object sender, EventArgs e)
-        {
-            context.Items.Load();
-            context.Measurements.Load();
-            for (int index = 0; index < 2; index++)
-            {
-                var item = context.Items.Single(i => i.nodeId == dataIds[index]);
-                var measurements = context.Measurements.Where(m => m.monitoredId == item.ID).ToList();
-
-                ExportCSV(measurements, dataNames[index]);
-            }
-            
-        }
+        
 
         private static void ExportCSV<T>(List<T> list, string fileName)
         {
@@ -308,7 +465,79 @@ namespace PlcFxUa
             {
                 MessageBox.Show(exc.Message);
             }
+        }
+        private void WriteAndRead(int index, TextBox textBox)
+        {
+            string nodeToWrite = settingIds[index];
+            var item = context.Items.Single(i => i.nodeId == nodeToWrite);
 
+            this.writer.SetWriter(item.dataType, textBox);
+            writer.WriteNode(this, nodeToWrite);
+
+            context.Items.Remove(item);
+            context.SaveChanges();
+
+
+            DataValueCollection dataValues = new DataValueCollection();
+            dataValues = ReadTag(nodeToWrite);
+
+            textBox.Text = dataValues[0].Value.ToString();
+
+            foreach (var value in dataValues)
+            {
+                AddToDB(value, settingIds[index], settingNames[index]);
+                ++index;
+            }
+
+            subscription.ApplyChanges();
+            UpdateParent();
+        }
+
+        private void runBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (runBtn.Checked)
+            {
+                try
+                {
+                    parent.stopMonitoring = false;
+                    print = true;
+                    if (context == null)
+                        context = new MBase();
+
+                    var item = new MonitoredItem()
+                    {
+                        DisplayName = dataNames[0],
+                        StartNodeId = dataIds[0]
+                    };
+                    item.Notification += OnNotification;
+                    subscription.AddItem(item);
+
+
+                    var item2 = new MonitoredItem()
+                    {
+                        DisplayName = dataNames[1],
+                        StartNodeId = dataIds[1]
+                    };
+                    item2.Notification += OnNotification;
+                    subscription.AddItem(item2);
+
+
+                    subscription.ApplyChanges();
+                    UpdateParent();
+
+                    maxTB.Enabled = false;
+                    minTB.Enabled = false;
+                    tiTB.Enabled = false;
+                    xpTB.Enabled = false;
+                    tdTB.Enabled = false;
+                    kTB.Enabled = false;
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message);
+                }
+            }
+                
         }
     }
 }

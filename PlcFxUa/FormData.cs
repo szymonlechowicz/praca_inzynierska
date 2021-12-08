@@ -25,7 +25,6 @@ namespace PlcFxUa
         private BrowsingClass browsing;
         private MBase context;
         private bool print;
-        private bool stopMonitoring = false;
         private bool permToSave;
         public FormData(FormStart formStart, Session mainSession, MBase mainContext)
         {
@@ -40,6 +39,7 @@ namespace PlcFxUa
                 browsing.Populate(ObjectIds.ObjectsFolder, treeServer.Nodes);
                 treeServer.EndUpdate();
             }
+
         }
         private void treeServer_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
@@ -109,11 +109,10 @@ namespace PlcFxUa
                         context = new MBase();
 
                     permToSave = true;
-                    stopMonitoring = false;
+                    parent.stopMonitoring = false;
                     lineChart.Visible = true;
                     btnResume.Enabled = false;
 
-                    nodeLabel.Text = rd.DisplayName.ToString();
                     var item = new MonitoredItem(subscription.DefaultItem)
                     {
                         DisplayName = rd.DisplayName.ToString(),
@@ -144,7 +143,7 @@ namespace PlcFxUa
         private void OnNotification(MonitoredItem item, MonitoredItemNotificationEventArgs e)
         {
 
-            if (!stopMonitoring)
+            if (!parent.stopMonitoring)
             {
                 if (InvokeRequired)
                 {
@@ -186,19 +185,20 @@ namespace PlcFxUa
 
                     monitoredItem.measurements.Add(measurement);
                     context.Items.Add(monitoredItem);
-                    context.SaveChanges();
                 }
                 else
                 {
                     Item monitoredItem = context.Items.FirstOrDefault(i => i.nodeId == nodeId);
                     monitoredItem.measurements.Add(measurement);
-                    context.SaveChanges();
                 }
 
-                var measurements = (from m in context.Measurements select m).ToList();
+                context.SaveChanges();
 
-
-                DrawChart(measurements);
+                
+                var itemDB = context.Items.Single(i => i.nodeId == nodeId);
+                var measurements = context.Measurements.Where(m => m.monitoredId == itemDB.ID).ToList();
+                DrawChart(measurements, itemDB.displayName);
+                UpdateParent();
             }
         }
 
@@ -207,7 +207,7 @@ namespace PlcFxUa
             parent.GetSession(session);
             parent.GetDB(context);
         }
-        private void DrawChart(List<Measurement> measurements)
+        private void DrawChart(List<Measurement> measurements, string seriesName)
         {
             // TO TRY:
             // 1) dictionary <string, double>
@@ -215,13 +215,13 @@ namespace PlcFxUa
             if (this.print)
             {
                 lineChart.Series.Clear();
-                lineChart.Series.Add("Measure");
-                lineChart.Series["Measure"].ChartType = SeriesChartType.Line;
+                lineChart.Series.Add(seriesName);
+                lineChart.Series[seriesName].ChartType = SeriesChartType.Line;
                 double x;
                 foreach (var measurement in measurements)
                 {
                     x = (measurement.time.Ticks - measurement.time.Ticks) / 10000000;
-                    lineChart.Series["Measure"].Points.AddXY(x, Convert.ToDouble(measurement.value));
+                    lineChart.Series[seriesName].Points.AddXY(x, Convert.ToDouble(measurement.value));
                 }
             }
             else return;
@@ -246,13 +246,12 @@ namespace PlcFxUa
             this.print = false;
             lineChart.Series.Clear();
 
-            stopMonitoring = true;
-            context.Database.ExecuteSqlCommand("Delete from Measurements");
+            parent.stopMonitoring = true;
+            //context.Database.ExecuteSqlCommand("Delete from Measurements");
             this.print = true;
             treeServer.SelectedNode = null;
-            nodeLabel.Text = "Select node";
             treeServer.Enabled = true;
-            this.permToSave = false;
+            //this.permToSave = false;
         }
 
         private void FormData_FormClosing(object sender, FormClosingEventArgs e)

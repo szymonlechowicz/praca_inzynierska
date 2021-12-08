@@ -16,16 +16,13 @@ namespace PlcFxUa
 {
     public partial class FormMonitor : Form
     {
-        // TO TRY: Reading more items and changing them
-        // TO DO: reading structure: new form?
         private FormStart parent;
         private BrowsingClass browsing;
         private Session session;
         private Subscription subscription;
-        private string dataType;
         private MBase context;
-        private NodeId changeableNode;
         private bool firstSelection;
+        private Writer writer;
         public FormMonitor(FormStart formStart, Session mainSession, MBase mainContext)
         {
             InitializeComponent();
@@ -35,13 +32,15 @@ namespace PlcFxUa
             if (this.session != null)
             {
                 this.browsing = new BrowsingClass(this.session);
+                this.writer = new Writer(this.session, this.parent);
                 treeServer.BeginUpdate();
                 browsing.Populate(ObjectIds.ObjectsFolder, treeServer.Nodes);
                 treeServer.EndUpdate();
             }
             this.context = mainContext;
             this.firstSelection = true;
-            
+            if (this.context != null)
+                CreateView();
         }
 
         private void treeServer_BeforeExpand(object sender, TreeViewCancelEventArgs e)
@@ -114,6 +113,7 @@ namespace PlcFxUa
                         context = new MBase();
 
                     ItemsView.Visible = true;
+                    this.parent.stopMonitoring = false;
 
                     var item = new MonitoredItem()
                     {
@@ -136,59 +136,63 @@ namespace PlcFxUa
         }
         private void OnNotification(MonitoredItem item, MonitoredItemNotificationEventArgs e)
         {
-            try
+            if(!parent.stopMonitoring)
             {
-                if (InvokeRequired)
+                try
                 {
-                    BeginInvoke(new MonitoredItemNotificationEventHandler(OnNotification), item, e);
-                    return;
-                }
-
-                MonitoredItemNotification data = e.NotificationValue as MonitoredItemNotification;
-
-                if (data == null) return;
-
-                string type = data.Value.WrappedValue.TypeInfo.BuiltInType.ToString();
-                if (data.Value.WrappedValue.TypeInfo.ValueRank >= 0)
-                    type += "[]";
-
-                string nodeId = item.StartNodeId.ToString();
-
-                var measurement = new Measurement()
-                {
-                    time = data.Value.SourceTimestamp,
-                    value = data.Value.WrappedValue.ToString()
-                };
-
-
-                if (!context.Items.Any(i => i.nodeId == nodeId))
-                {
-                    var monitoredItem = new Item
+                    if (InvokeRequired)
                     {
-                        nodeId = nodeId,
-                        displayName = item.DisplayName,
-                        dataType = type,
-                        measurements = new List<Measurement>()
+                        BeginInvoke(new MonitoredItemNotificationEventHandler(OnNotification), item, e);
+                        return;
+                    }
+
+                    MonitoredItemNotification data = e.NotificationValue as MonitoredItemNotification;
+
+                    if (data == null) return;
+
+                    string type = data.Value.WrappedValue.TypeInfo.BuiltInType.ToString();
+                    if (data.Value.WrappedValue.TypeInfo.ValueRank >= 0)
+                        type += "[]";
+
+                    string nodeId = item.StartNodeId.ToString();
+
+                    var measurement = new Measurement()
+                    {
+                        time = data.Value.SourceTimestamp,
+                        value = data.Value.WrappedValue.ToString()
                     };
 
-                    monitoredItem.measurements.Add(measurement);
-                    context.Items.Add(monitoredItem);
-                    context.SaveChanges();
-                }
-                else
-                {
-                    Item monitoredItem = context.Items.FirstOrDefault(i => i.nodeId == nodeId);
-                    monitoredItem.measurements.Add(measurement);
-                    context.SaveChanges();
+
+                    if (!context.Items.Any(i => i.nodeId == nodeId))
+                    {
+                        var monitoredItem = new Item
+                        {
+                            nodeId = nodeId,
+                            displayName = item.DisplayName,
+                            dataType = type,
+                            measurements = new List<Measurement>()
+                        };
+
+                        monitoredItem.measurements.Add(measurement);
+                        context.Items.Add(monitoredItem);
+                        context.SaveChanges();
+                    }
+                    else
+                    {
+                        Item monitoredItem = context.Items.FirstOrDefault(i => i.nodeId == nodeId);
+                        monitoredItem.measurements.Add(measurement);
+                        context.SaveChanges();
+                    }
+
+                    CreateView();
                 }
 
-                CreateView();
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message);
+                }
             }
             
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
-            }
         }
 
         private void CreateView()
@@ -210,7 +214,7 @@ namespace PlcFxUa
         private void ItemsView_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             DataGridViewRow row = ItemsView.Rows[e.RowIndex];
-
+            
             btnModify.Enabled = false;
             WriteTextBox.Enabled = false;
 
@@ -260,16 +264,15 @@ namespace PlcFxUa
 
                             if (item.dataType[item.dataType.Length-1] == ']')
                             {
-                                MessageBox.Show("Error! This node is an array! Search it in submenu 'Structure'");
+                                MessageBox.Show("Error! It is array, you cannot change it!");
                             }
                             else
                             {
-                                this.changeableNode = nodeToWrite;
-                                this.dataType = item.dataType;
+                                this.writer.SetWriter(item.dataType, WriteTextBox);
 
                                 btnModify.Enabled = true;
                                 WriteTextBox.Enabled = true;
-
+                                WriteTextBox.Text = ItemsView.CurrentCell.Value.ToString();
 
                                 Thread.Sleep(1000);
                                 context.Items.Remove(item);
@@ -289,148 +292,23 @@ namespace PlcFxUa
         
         private void btnModify_Click(object sender, EventArgs e)
         {
-            WriteNode();
-            CreateView();
+            AcceptWriting();
         }
 
         private void WriteTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                WriteNode();
-                CreateView();
+                AcceptWriting();
             }
         }
 
-        private void WriteNode()
+        private void AcceptWriting()
         {
-            try
-            {
-                WriteValue valueToWrite = new WriteValue();
-                valueToWrite.NodeId = changeableNode;
-                valueToWrite.AttributeId = Attributes.Value;
-                valueToWrite.Value.Value = SetTypeAndValue();
-                valueToWrite.Value.StatusCode = StatusCodes.Good;
-                valueToWrite.Value.ServerTimestamp = DateTime.MinValue;
-                valueToWrite.Value.SourceTimestamp = DateTime.MinValue;
-
-                WriteValueCollection valuesToWrite = new WriteValueCollection();
-                valuesToWrite.Add(valueToWrite);
-
-                StatusCodeCollection results = null;
-                DiagnosticInfoCollection diagnosticInfos = null;
-                
-                this.session.Write(
-                    null,
-                    valuesToWrite,
-                    out results,
-                    out diagnosticInfos);
-
-                ClientBase.ValidateResponse(results, valuesToWrite);
-                ClientBase.ValidateDiagnosticInfos(diagnosticInfos, valuesToWrite);
-
-                if (StatusCode.IsBad(results[0]))
-                {
-                    throw new ServiceResultException(results[0]);
-                }
-
-                DialogResult = DialogResult.OK;
-                Thread.Sleep(1000);
-
-                parent.operationLabel.Text = "Writing completed.";
-                parent.operationLabel.Visible = true;
-                btnModify.Enabled = false;
-                WriteTextBox.Enabled = false;
-
-            }
-
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
-            }
-        }
-
-        private object SetTypeAndValue()
-        {
-            //object tempValue = (value != null) ? value.Value : null;
-            object tempValue;
-
-            switch (dataType)
-            {
-                case "Boolean":
-                    {
-                        tempValue = Convert.ToBoolean(WriteTextBox.Text);
-                        break;
-                    }
-
-                case "SByte":
-                    {
-                        tempValue = Convert.ToSByte(WriteTextBox.Text);
-                        break;
-                    }
-
-                case "Byte":
-                    {
-                        tempValue = Convert.ToByte(WriteTextBox.Text);
-                        break;
-                    }
-
-                case "Int16":
-                    {
-                        tempValue = Convert.ToInt16(WriteTextBox.Text);
-                        break;
-                    }
-
-                case "UInt16":
-                    {
-                        tempValue = Convert.ToUInt16(WriteTextBox.Text);
-                        break;
-                    }
-
-                case "Int32":
-                    {
-                        tempValue = Convert.ToInt32(WriteTextBox.Text);
-                        break;
-                    }
-
-                case "UInt32":
-                    {
-                        tempValue = Convert.ToUInt32(WriteTextBox.Text);
-                        break;
-                    }
-
-                case "Int64":
-                    {
-                        tempValue = Convert.ToInt64(WriteTextBox.Text);
-                        break;
-                    }
-
-                case "UInt64":
-                    {
-                        tempValue = Convert.ToUInt64(WriteTextBox.Text);
-                        break;
-                    }
-
-                case "Float":
-                    {
-                        tempValue = Convert.ToSingle(WriteTextBox.Text);
-                        break;
-                    }
-
-                case "Double":
-                    {
-                        tempValue = Convert.ToDouble(WriteTextBox.Text);
-                        break;
-                    }
-
-                default:
-                    {
-                        tempValue = WriteTextBox.Text;
-                        break;
-                    }
-            }
-
-            return tempValue;
+            this.writer.WriteNode(this, ItemsView.CurrentRow.Cells[5].Value.ToString());
+            CreateView();
+            btnModify.Enabled = false;
+            WriteTextBox.Enabled = false;
         }
 
         private void UpdateParent()
@@ -446,6 +324,14 @@ namespace PlcFxUa
             totalHeight += dgv.Rows.Count;
             var totalWidth = dgv.Columns.GetColumnsWidth(states);
             dgv.ClientSize = new Size(totalWidth, totalHeight);
+            dgv.AutoResizeColumns(
+            DataGridViewAutoSizeColumnsMode.AllCells);
+        }
+
+        private void FormMonitor_Click(object sender, EventArgs e)
+        {
+            ItemsView.DataSource = null;
+            ItemsView.Rows.Clear();
         }
     }
 }

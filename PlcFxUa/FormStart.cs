@@ -22,6 +22,7 @@ namespace PlcFxUa
         private bool connected = false;
         private ApplicationConfiguration config;
         private MBase context;
+        public bool stopMonitoring = false;
 
         public FormStart()
         {
@@ -46,7 +47,15 @@ namespace PlcFxUa
             childForm.Show();
         }
 
-
+        private void OpenIfConnected(Form childForm)
+        {
+            if (session == null || !session.Connected)
+            {
+                MessageBox.Show("Not connected to server");
+                return;
+            }
+            else OpenChildForm(childForm);
+        }
         private void menuConnect_Click(object sender, EventArgs e)
         {
             OpenChildForm(new FormConnect(this, session, connected, config));
@@ -54,25 +63,25 @@ namespace PlcFxUa
 
         private void menuMonitor_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new FormMonitor(this, session, context));
+            OpenIfConnected(new FormMonitor(this, session, context));
         }
 
         private void menuPID_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new FormPid(this, session, context));
+            OpenIfConnected(new FormPid(this, session, context));
         }
         private void menuBrowse_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new FormBrowse(this, session));
+            OpenIfConnected(new FormBrowse(this, session));
         }
         private void MenuCalling_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new FormMethod(this, session));
+            OpenIfConnected(new FormMethod(this, session));
         }
 
         private void menuData_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new FormData(this, session, context));
+            OpenIfConnected(new FormData(this, session, context));
         }
 
 
@@ -96,12 +105,24 @@ namespace PlcFxUa
 
         private void FormStart_FormClosing(object sender, FormClosingEventArgs e)
         {
+            
+        }
+
+        private void databaseBtn_ButtonClick(object sender, EventArgs e)
+        {
+            stopMonitoring = true;
             if (context != null)
             {
                 context.Database.ExecuteSqlCommand("Delete from Items");
                 context.Database.ExecuteSqlCommand("Delete from Measurements");
+                MessageBox.Show("Database clear");
             }
         }
 
+        private void FormStart_Load(object sender, EventArgs e)
+        {
+            OpenChildForm(new FormConnect(this, session, connected, config));
+        }
+        
     }
 }

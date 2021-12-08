@@ -20,6 +20,7 @@ namespace PlcFxUa
         private BrowsingClass browsing;
         private NodeId methodId;
         private NodeId objectId;
+        private Writer writer;
 
         public FormMethod()
         {
@@ -35,6 +36,7 @@ namespace PlcFxUa
             if (this.session != null)
             {
                 this.browsing = new BrowsingClass(this.session);
+                this.writer = new Writer(this.session, this.parent);
                 treeServer.BeginUpdate();
                 browsing.Populate(ObjectIds.ObjectsFolder, treeServer.Nodes);
                 treeServer.EndUpdate();
@@ -201,6 +203,7 @@ namespace PlcFxUa
 
                 if (argument != null)
                 {
+                    //this.writer.SetWriter(this.session.NodeCache.GetDisplayText(argument.DataType), item.SubItems[2]);
                     inputs.Add(new Variant(AddTypeValue(argument, item)));
                 }
             }

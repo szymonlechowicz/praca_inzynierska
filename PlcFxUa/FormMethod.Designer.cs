@@ -39,42 +39,53 @@ namespace PlcFxUa
             // 
             // btnCall
             // 
+            this.btnCall.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
             this.btnCall.Enabled = false;
-            this.btnCall.Location = new System.Drawing.Point(495, 170);
+            this.btnCall.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnCall.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnCall.ForeColor = System.Drawing.Color.White;
+            this.btnCall.Location = new System.Drawing.Point(400, 242);
             this.btnCall.Name = "btnCall";
-            this.btnCall.Size = new System.Drawing.Size(75, 23);
+            this.btnCall.Size = new System.Drawing.Size(83, 31);
             this.btnCall.TabIndex = 4;
             this.btnCall.Text = "Call";
-            this.btnCall.UseVisualStyleBackColor = true;
+            this.btnCall.UseVisualStyleBackColor = false;
             this.btnCall.Click += new System.EventHandler(this.btnCall_Click);
             // 
             // modifyTB
             // 
             this.modifyTB.Enabled = false;
-            this.modifyTB.Location = new System.Drawing.Point(950, 55);
+            this.modifyTB.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.modifyTB.Location = new System.Drawing.Point(758, 244);
             this.modifyTB.Name = "modifyTB";
-            this.modifyTB.Size = new System.Drawing.Size(100, 22);
+            this.modifyTB.Size = new System.Drawing.Size(123, 26);
             this.modifyTB.TabIndex = 6;
             this.modifyTB.KeyDown += new System.Windows.Forms.KeyEventHandler(this.modifyTB_KeyDown);
             // 
             // btnModify
             // 
+            this.btnModify.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
             this.btnModify.Enabled = false;
-            this.btnModify.Location = new System.Drawing.Point(964, 83);
+            this.btnModify.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnModify.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnModify.ForeColor = System.Drawing.Color.White;
+            this.btnModify.Location = new System.Drawing.Point(878, 242);
             this.btnModify.Name = "btnModify";
-            this.btnModify.Size = new System.Drawing.Size(75, 23);
+            this.btnModify.Size = new System.Drawing.Size(83, 31);
             this.btnModify.TabIndex = 7;
             this.btnModify.Text = "Modify";
-            this.btnModify.UseVisualStyleBackColor = true;
+            this.btnModify.UseVisualStyleBackColor = false;
             this.btnModify.Click += new System.EventHandler(this.btnModify_Click);
             // 
             // treeServer
             // 
             this.treeServer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.treeServer.Location = new System.Drawing.Point(12, 12);
+            this.treeServer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(228)))), ((int)(((byte)(255)))), ((int)(((byte)(249)))));
+            this.treeServer.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.treeServer.Location = new System.Drawing.Point(25, 25);
             this.treeServer.Name = "treeServer";
-            this.treeServer.Size = new System.Drawing.Size(284, 367);
+            this.treeServer.Size = new System.Drawing.Size(300, 550);
             this.treeServer.TabIndex = 9;
             this.treeServer.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeServer_BeforeExpand);
             this.treeServer.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeServer_AfterSelect);
@@ -82,9 +93,9 @@ namespace PlcFxUa
             // outputLV
             // 
             this.outputLV.HideSelection = false;
-            this.outputLV.Location = new System.Drawing.Point(316, 236);
+            this.outputLV.Location = new System.Drawing.Point(400, 294);
             this.outputLV.Name = "outputLV";
-            this.outputLV.Size = new System.Drawing.Size(603, 143);
+            this.outputLV.Size = new System.Drawing.Size(555, 281);
             this.outputLV.TabIndex = 5;
             this.outputLV.UseCompatibleStateImageBehavior = false;
             // 
@@ -92,9 +103,9 @@ namespace PlcFxUa
             // 
             this.inputLV.FullRowSelect = true;
             this.inputLV.HideSelection = false;
-            this.inputLV.Location = new System.Drawing.Point(316, 24);
+            this.inputLV.Location = new System.Drawing.Point(400, 25);
             this.inputLV.Name = "inputLV";
-            this.inputLV.Size = new System.Drawing.Size(603, 140);
+            this.inputLV.Size = new System.Drawing.Size(555, 193);
             this.inputLV.TabIndex = 3;
             this.inputLV.UseCompatibleStateImageBehavior = false;
             this.inputLV.SelectedIndexChanged += new System.EventHandler(this.inputLV_SelectedIndexChanged);
@@ -103,7 +114,8 @@ namespace PlcFxUa
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1094, 423);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(199)))), ((int)(((byte)(214)))), ((int)(((byte)(219)))));
+            this.ClientSize = new System.Drawing.Size(1400, 600);
             this.Controls.Add(this.treeServer);
             this.Controls.Add(this.btnModify);
             this.Controls.Add(this.modifyTB);

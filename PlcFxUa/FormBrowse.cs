@@ -20,10 +20,6 @@ namespace PlcFxUa
         private Subscription subscription;
         private List<NodeInfo> nodeInfo;
         private BrowsingClass browsing;
-        public FormBrowse()
-        {
-            InitializeComponent();
-        }
 
         public FormBrowse(FormStart formStart, Session mainSession)
         {
@@ -39,14 +35,13 @@ namespace PlcFxUa
             }
             if (this.subscription == null)
             {
+                nameLabel.Text = "";
                 subscriptionLabel.Text = "No subscription.\nDouble click node to subscribe";
             }
-            if (session == null || !session.Connected)
-            {
-                MessageBox.Show("Not connected to server");
-                treeServer.Visible = false;
-                return;
-            }
+            label1.Text = "Here you can browse server\nnodes, get info about them and\nyou can start" +
+                " subscribing node\nby double click on the node.\nNOTICE! On this form monitored\nitem doesn't save to database.";
+
+
 
             try
             {
