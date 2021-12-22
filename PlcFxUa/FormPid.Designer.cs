@@ -29,18 +29,22 @@ namespace PlcFxUa
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.inputChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.outputChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnOpen = new System.Windows.Forms.Button();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.btnStop = new System.Windows.Forms.Button();
+            this.btnPause = new System.Windows.Forms.Button();
+            this.btnResume = new System.Windows.Forms.Button();
             this.btnRun = new System.Windows.Forms.Button();
-            this.helpLabel = new System.Windows.Forms.Label();
             this.tdLbl = new System.Windows.Forms.Label();
             this.xpLbl = new System.Windows.Forms.Label();
             this.tiLbl = new System.Windows.Forms.Label();
@@ -53,11 +57,6 @@ namespace PlcFxUa
             this.minTB = new System.Windows.Forms.TextBox();
             this.maxLbl = new System.Windows.Forms.Label();
             this.maxTB = new System.Windows.Forms.TextBox();
-            this.btnOpen = new System.Windows.Forms.Button();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnStop = new System.Windows.Forms.Button();
-            this.btnPause = new System.Windows.Forms.Button();
-            this.btnResume = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.inputChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.outputChart)).BeginInit();
             this.panel1.SuspendLayout();
@@ -66,56 +65,56 @@ namespace PlcFxUa
             // 
             // inputChart
             // 
-            chartArea1.AxisX.ArrowStyle = System.Windows.Forms.DataVisualization.Charting.AxisArrowStyle.Triangle;
-            chartArea1.AxisX.Crossing = -1.7976931348623157E+308D;
-            chartArea1.AxisX.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
-            chartArea1.AxisY.ArrowStyle = System.Windows.Forms.DataVisualization.Charting.AxisArrowStyle.Triangle;
-            chartArea1.AxisY.Crossing = -1.7976931348623157E+308D;
-            chartArea1.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
-            chartArea1.BorderColor = System.Drawing.Color.Silver;
-            chartArea1.Name = "ChartArea1";
-            this.inputChart.ChartAreas.Add(chartArea1);
-            legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend1.Name = "Legend1";
-            this.inputChart.Legends.Add(legend1);
+            chartArea3.AxisX.ArrowStyle = System.Windows.Forms.DataVisualization.Charting.AxisArrowStyle.Triangle;
+            chartArea3.AxisX.Crossing = -1.7976931348623157E+308D;
+            chartArea3.AxisX.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
+            chartArea3.AxisY.ArrowStyle = System.Windows.Forms.DataVisualization.Charting.AxisArrowStyle.Triangle;
+            chartArea3.AxisY.Crossing = -1.7976931348623157E+308D;
+            chartArea3.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
+            chartArea3.BorderColor = System.Drawing.Color.Silver;
+            chartArea3.Name = "ChartArea1";
+            this.inputChart.ChartAreas.Add(chartArea3);
+            legend3.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend3.Name = "Legend1";
+            this.inputChart.Legends.Add(legend3);
             this.inputChart.Location = new System.Drawing.Point(429, 14);
             this.inputChart.Name = "inputChart";
             this.inputChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.None;
             this.inputChart.PaletteCustomColors = new System.Drawing.Color[] {
         System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(132)))), ((int)(((byte)(52)))))};
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series1.Legend = "Legend1";
-            series1.Name = "Measure";
-            this.inputChart.Series.Add(series1);
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series3.Legend = "Legend1";
+            series3.Name = "Measurement";
+            this.inputChart.Series.Add(series3);
             this.inputChart.Size = new System.Drawing.Size(943, 280);
             this.inputChart.TabIndex = 15;
             this.inputChart.Text = "inputChart";
             // 
             // outputChart
             // 
-            chartArea2.AxisX.ArrowStyle = System.Windows.Forms.DataVisualization.Charting.AxisArrowStyle.Triangle;
-            chartArea2.AxisX.Crossing = -1.7976931348623157E+308D;
-            chartArea2.AxisX.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
-            chartArea2.AxisY.ArrowStyle = System.Windows.Forms.DataVisualization.Charting.AxisArrowStyle.Triangle;
-            chartArea2.AxisY.Crossing = -1.7976931348623157E+308D;
-            chartArea2.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
-            chartArea2.BorderColor = System.Drawing.Color.Silver;
-            chartArea2.Name = "ChartArea1";
-            this.outputChart.ChartAreas.Add(chartArea2);
-            legend2.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend2.Name = "Legend1";
-            this.outputChart.Legends.Add(legend2);
+            chartArea4.AxisX.ArrowStyle = System.Windows.Forms.DataVisualization.Charting.AxisArrowStyle.Triangle;
+            chartArea4.AxisX.Crossing = -1.7976931348623157E+308D;
+            chartArea4.AxisX.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
+            chartArea4.AxisY.ArrowStyle = System.Windows.Forms.DataVisualization.Charting.AxisArrowStyle.Triangle;
+            chartArea4.AxisY.Crossing = -1.7976931348623157E+308D;
+            chartArea4.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
+            chartArea4.BorderColor = System.Drawing.Color.Silver;
+            chartArea4.Name = "ChartArea1";
+            this.outputChart.ChartAreas.Add(chartArea4);
+            legend4.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend4.Name = "Legend1";
+            this.outputChart.Legends.Add(legend4);
             this.outputChart.Location = new System.Drawing.Point(429, 308);
             this.outputChart.Name = "outputChart";
             this.outputChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.None;
             this.outputChart.PaletteCustomColors = new System.Drawing.Color[] {
         System.Drawing.Color.FromArgb(((int)(((byte)(201)))), ((int)(((byte)(93)))), ((int)(((byte)(99)))))};
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series2.Legend = "Legend1";
-            series2.Name = "Measure";
-            this.outputChart.Series.Add(series2);
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series4.Legend = "Legend1";
+            series4.Name = "Measurement";
+            this.outputChart.Series.Add(series4);
             this.outputChart.Size = new System.Drawing.Size(943, 280);
             this.outputChart.TabIndex = 16;
             this.outputChart.Text = "chart1";
@@ -125,7 +124,6 @@ namespace PlcFxUa
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(184)))), ((int)(((byte)(243)))), ((int)(((byte)(255)))));
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Controls.Add(this.btnRun);
-            this.panel1.Controls.Add(this.helpLabel);
             this.panel1.Controls.Add(this.tdLbl);
             this.panel1.Controls.Add(this.xpLbl);
             this.panel1.Controls.Add(this.tiLbl);
@@ -158,6 +156,66 @@ namespace PlcFxUa
             this.panel2.Size = new System.Drawing.Size(335, 75);
             this.panel2.TabIndex = 42;
             // 
+            // btnOpen
+            // 
+            this.btnOpen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
+            this.btnOpen.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnOpen.Image = global::PlcFxUa.Properties.Resources.csv_32;
+            this.btnOpen.Location = new System.Drawing.Point(270, 10);
+            this.btnOpen.Name = "btnOpen";
+            this.btnOpen.Size = new System.Drawing.Size(55, 55);
+            this.btnOpen.TabIndex = 13;
+            this.btnOpen.UseVisualStyleBackColor = false;
+            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+            // 
+            // btnSave
+            // 
+            this.btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
+            this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnSave.Image = global::PlcFxUa.Properties.Resources.save_32;
+            this.btnSave.Location = new System.Drawing.Point(205, 10);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(55, 55);
+            this.btnSave.TabIndex = 12;
+            this.btnSave.UseVisualStyleBackColor = false;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnStop
+            // 
+            this.btnStop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
+            this.btnStop.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnStop.Image = global::PlcFxUa.Properties.Resources.stop_32;
+            this.btnStop.Location = new System.Drawing.Point(140, 10);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(55, 55);
+            this.btnStop.TabIndex = 11;
+            this.btnStop.UseVisualStyleBackColor = false;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            // 
+            // btnPause
+            // 
+            this.btnPause.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
+            this.btnPause.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnPause.Image = global::PlcFxUa.Properties.Resources.pause_32;
+            this.btnPause.Location = new System.Drawing.Point(75, 10);
+            this.btnPause.Name = "btnPause";
+            this.btnPause.Size = new System.Drawing.Size(55, 55);
+            this.btnPause.TabIndex = 10;
+            this.btnPause.UseVisualStyleBackColor = false;
+            this.btnPause.Click += new System.EventHandler(this.btnPause_Click);
+            // 
+            // btnResume
+            // 
+            this.btnResume.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
+            this.btnResume.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnResume.Image = global::PlcFxUa.Properties.Resources.play_32;
+            this.btnResume.Location = new System.Drawing.Point(10, 10);
+            this.btnResume.Name = "btnResume";
+            this.btnResume.Size = new System.Drawing.Size(55, 55);
+            this.btnResume.TabIndex = 9;
+            this.btnResume.UseVisualStyleBackColor = false;
+            this.btnResume.Click += new System.EventHandler(this.btnResume_Click);
+            // 
             // btnRun
             // 
             this.btnRun.Location = new System.Drawing.Point(168, 339);
@@ -167,15 +225,6 @@ namespace PlcFxUa
             this.btnRun.Text = "Run";
             this.btnRun.UseVisualStyleBackColor = true;
             this.btnRun.Click += new System.EventHandler(this.btnRun_Click);
-            // 
-            // helpLabel
-            // 
-            this.helpLabel.AutoSize = true;
-            this.helpLabel.Location = new System.Drawing.Point(59, 393);
-            this.helpLabel.Name = "helpLabel";
-            this.helpLabel.Size = new System.Drawing.Size(46, 17);
-            this.helpLabel.TabIndex = 38;
-            this.helpLabel.Text = "label1";
             // 
             // tdLbl
             // 
@@ -291,66 +340,6 @@ namespace PlcFxUa
             this.maxTB.Tag = "0";
             this.maxTB.KeyDown += new System.Windows.Forms.KeyEventHandler(this.maxTB_KeyDown);
             // 
-            // btnOpen
-            // 
-            this.btnOpen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
-            this.btnOpen.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnOpen.Image = global::PlcFxUa.Properties.Resources.csv_32;
-            this.btnOpen.Location = new System.Drawing.Point(270, 10);
-            this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Size = new System.Drawing.Size(55, 55);
-            this.btnOpen.TabIndex = 13;
-            this.btnOpen.UseVisualStyleBackColor = false;
-            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
-            // 
-            // btnSave
-            // 
-            this.btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
-            this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnSave.Image = global::PlcFxUa.Properties.Resources.save_32;
-            this.btnSave.Location = new System.Drawing.Point(205, 10);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(55, 55);
-            this.btnSave.TabIndex = 12;
-            this.btnSave.UseVisualStyleBackColor = false;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
-            // btnStop
-            // 
-            this.btnStop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
-            this.btnStop.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnStop.Image = global::PlcFxUa.Properties.Resources.stop_32;
-            this.btnStop.Location = new System.Drawing.Point(140, 10);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(55, 55);
-            this.btnStop.TabIndex = 11;
-            this.btnStop.UseVisualStyleBackColor = false;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
-            // 
-            // btnPause
-            // 
-            this.btnPause.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
-            this.btnPause.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnPause.Image = global::PlcFxUa.Properties.Resources.pause_32;
-            this.btnPause.Location = new System.Drawing.Point(75, 10);
-            this.btnPause.Name = "btnPause";
-            this.btnPause.Size = new System.Drawing.Size(55, 55);
-            this.btnPause.TabIndex = 10;
-            this.btnPause.UseVisualStyleBackColor = false;
-            this.btnPause.Click += new System.EventHandler(this.btnPause_Click);
-            // 
-            // btnResume
-            // 
-            this.btnResume.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(122)))), ((int)(((byte)(156)))), ((int)(((byte)(198)))));
-            this.btnResume.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnResume.Image = global::PlcFxUa.Properties.Resources.play_32;
-            this.btnResume.Location = new System.Drawing.Point(10, 10);
-            this.btnResume.Name = "btnResume";
-            this.btnResume.Size = new System.Drawing.Size(55, 55);
-            this.btnResume.TabIndex = 9;
-            this.btnResume.UseVisualStyleBackColor = false;
-            this.btnResume.Click += new System.EventHandler(this.btnResume_Click);
-            // 
             // FormPid
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -377,7 +366,6 @@ namespace PlcFxUa
         private System.Windows.Forms.DataVisualization.Charting.Chart inputChart;
         private System.Windows.Forms.DataVisualization.Charting.Chart outputChart;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label helpLabel;
         private System.Windows.Forms.Label tdLbl;
         private System.Windows.Forms.Label xpLbl;
         private System.Windows.Forms.Label tiLbl;

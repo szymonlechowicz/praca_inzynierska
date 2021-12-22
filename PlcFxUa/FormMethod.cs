@@ -15,17 +15,15 @@ namespace PlcFxUa
 {
     public partial class FormMethod : Form
     {
+        #region Private Fields
         private Session session;
         private FormStart parent;
         private BrowsingClass browsing;
         private NodeId methodId;
         private NodeId objectId;
+        #endregion
 
-        public FormMethod()
-        {
-            InitializeComponent();
-        }
-
+        #region Constructors
         public FormMethod(FormStart formStart, Session mainSession)
         {
             InitializeComponent();
@@ -65,7 +63,9 @@ namespace PlcFxUa
                 "To change\nvalue of argument, click\nthe value and edit it in\ntextbox under listview.\n" +
                 "Then click button 'Call' to\ncall the method.";
         }
+        #endregion
 
+        #region Private Members
         private void UpdateParent()
         {
             parent.GetSession(session);
@@ -117,7 +117,6 @@ namespace PlcFxUa
             }
             btnCall.Enabled = true;
         }
-
         private string[] UpdateRow(string[] row, Argument argument)
         {
             string dataType = this.session.NodeCache.GetDisplayText(argument.DataType);
@@ -159,43 +158,6 @@ namespace PlcFxUa
 
             return row;
         }
-        
-        private void btnCall_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                VariantCollection inputs = GetInput();
-
-                CallMethodRequest request = new CallMethodRequest();
-
-                request.ObjectId = this.objectId;
-                request.MethodId = this.methodId;
-                request.InputArguments = inputs;
-
-                CallMethodRequestCollection requests = new CallMethodRequestCollection();
-                requests.Add(request);
-
-                CallMethodResultCollection results;
-                DiagnosticInfoCollection diagnosticInfos;
-
-                ResponseHeader response = this.session.Call(null, requests, out results, out diagnosticInfos);
-
-                if (StatusCode.IsBad(results[0].StatusCode))
-                    throw new ServiceResultException(new ServiceResult(results[0].StatusCode, 0, diagnosticInfos, 
-                        response.StringTable));
-
-                SetOutput(results[0].OutputArguments);
-
-                if (results[0].OutputArguments.Count == 0)
-                    MessageBox.Show(this, "Calling method completed");
-
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
-            }
-        }
-
         private VariantCollection GetInput()
         {
             var inputs = new VariantCollection();
@@ -227,104 +189,6 @@ namespace PlcFxUa
                     argument.Value = outputs[i++].Value;
                     item.SubItems[2].Text = argument.Value.ToString();
                 }
-            }
-        }
-
-        private void inputLV_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            modifyTB.Enabled = true;
-            btnModify.Enabled = true;
-
-            if (inputLV.SelectedIndices.Count > 0) 
-                modifyTB.Text = inputLV.SelectedItems[0].SubItems[2].Text;
-        }
-
-        private void btnModify_Click(object sender, EventArgs e)
-        {
-            
-            inputLV.SelectedItems[0].SubItems[2].Text = modifyTB.Text;
-            if (inputLV.SelectedIndices.Count > 0)
-                for (int i = 0; i < inputLV.SelectedIndices.Count; i++)
-                    inputLV.Items[inputLV.SelectedIndices[i]].Selected = false;
-
-            btnModify.Enabled = false;
-            modifyTB.Enabled = false;
-        }
-        
-        private void treeServer_BeforeExpand(object sender, TreeViewCancelEventArgs e)
-        {
-            try
-            {
-                // check if node has already been expanded once.
-                if (e.Node.Nodes.Count != 1 || e.Node.Nodes[0].Text != String.Empty)
-                {
-                    return;
-                }
-
-                // get the source for the node.
-                ReferenceDescription rd = e.Node.Tag as ReferenceDescription;
-
-                if (rd == null || rd.NodeId.IsAbsolute)
-                {
-                    e.Cancel = true;
-                    return;
-                }
-
-                // populate children.
-                browsing.Populate((NodeId)rd.NodeId, e.Node.Nodes, (uint)(NodeClass.Object | NodeClass.ObjectType |
-                NodeClass.Method));
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
-        }
-
-        private void treeServer_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            try
-            {
-                if (session == null || !session.Connected)
-                {
-                    parent.operationLabel.Text = "No session";
-                    return;
-                }
-
-                ReferenceDescription rd = e.Node.Tag as ReferenceDescription;
-                ReferenceDescription rdParent = null;
-
-                if (e.Node.Parent != null)
-                {
-                    rdParent = e.Node.Parent.Tag as ReferenceDescription;
-                }
-                else
-                {
-                    rdParent = rd;
-                }
-
-                if (rd == null || rd.NodeId.IsAbsolute)
-                {
-                    return;
-                }
-                else
-                {
-                    methodId = (NodeId)rd.NodeId;
-                    objectId = (NodeId)rdParent.NodeId;
-                }
-
-                if (objectId == null || methodId == null)
-                {
-                    return;
-                }
-
-                Display(true);
-                Display(false);
-
-                UpdateParent();
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
             }
         }
         private object AddTypeValue(Argument argument, ListViewItem item)
@@ -408,7 +272,139 @@ namespace PlcFxUa
 
             return tempValue;
         }
+        #endregion
 
+        #region Event Handlers
+        private void btnCall_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                VariantCollection inputs = GetInput();
+
+                CallMethodRequest request = new CallMethodRequest();
+
+                request.ObjectId = this.objectId;
+                request.MethodId = this.methodId;
+                request.InputArguments = inputs;
+
+                CallMethodRequestCollection requests = new CallMethodRequestCollection();
+                requests.Add(request);
+
+                CallMethodResultCollection results;
+                DiagnosticInfoCollection diagnosticInfos;
+
+                ResponseHeader response = this.session.Call(null, requests, out results, out diagnosticInfos);
+
+                if (StatusCode.IsBad(results[0].StatusCode))
+                    throw new ServiceResultException(new ServiceResult(results[0].StatusCode, 0, diagnosticInfos, 
+                        response.StringTable));
+
+                SetOutput(results[0].OutputArguments);
+
+                if (results[0].OutputArguments.Count == 0)
+                    MessageBox.Show(this, "Calling method completed");
+
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
+        }
+        private void inputLV_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            modifyTB.Enabled = true;
+            btnModify.Enabled = true;
+
+            if (inputLV.SelectedIndices.Count > 0) 
+                modifyTB.Text = inputLV.SelectedItems[0].SubItems[2].Text;
+        }
+        private void btnModify_Click(object sender, EventArgs e)
+        {
+            
+            inputLV.SelectedItems[0].SubItems[2].Text = modifyTB.Text;
+            if (inputLV.SelectedIndices.Count > 0)
+                for (int i = 0; i < inputLV.SelectedIndices.Count; i++)
+                    inputLV.Items[inputLV.SelectedIndices[i]].Selected = false;
+
+            btnModify.Enabled = false;
+            modifyTB.Enabled = false;
+        }
+        private void treeServer_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            try
+            {
+                // check if node has already been expanded once.
+                if (e.Node.Nodes.Count != 1 || e.Node.Nodes[0].Text != String.Empty)
+                {
+                    return;
+                }
+
+                // get the source for the node.
+                ReferenceDescription rd = e.Node.Tag as ReferenceDescription;
+
+                if (rd == null || rd.NodeId.IsAbsolute)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
+                // populate children.
+                browsing.Populate((NodeId)rd.NodeId, e.Node.Nodes, (uint)(NodeClass.Object | NodeClass.ObjectType |
+                NodeClass.Method));
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
+
+        private void treeServer_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            try
+            {
+                if (session == null || !session.Connected)
+                {
+                    parent.operationLabel.Text = "No session";
+                    return;
+                }
+
+                ReferenceDescription rd = e.Node.Tag as ReferenceDescription;
+                ReferenceDescription rdParent = null;
+
+                if (e.Node.Parent != null)
+                {
+                    rdParent = e.Node.Parent.Tag as ReferenceDescription;
+                }
+                else
+                {
+                    rdParent = rd;
+                }
+
+                if (rd == null || rd.NodeId.IsAbsolute)
+                {
+                    return;
+                }
+                else
+                {
+                    methodId = (NodeId)rd.NodeId;
+                    objectId = (NodeId)rdParent.NodeId;
+                }
+
+                if (objectId == null || methodId == null)
+                {
+                    return;
+                }
+
+                Display(true);
+                Display(false);
+
+                UpdateParent();
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
+        }
         private void modifyTB_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -422,5 +418,6 @@ namespace PlcFxUa
                 modifyTB.Enabled = false;
             }
         }
+        #endregion
     }
 }

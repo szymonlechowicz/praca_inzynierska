@@ -12,15 +12,22 @@ namespace PlcFxUa
 {
     class Writer
     {
+        #region Private Fields
         private Session session;
         private FormStart parent;
         private string dataType;
         private Control control;
+        #endregion
+
+        #region Constructors
         public Writer(Session mainSession, FormStart formStart)
         {
             this.session = mainSession;
             this.parent = formStart;
         }
+        #endregion
+
+        #region Public Interface
         public void SetWriter(string dataType, Control control)
         {
             this.dataType = dataType;
@@ -35,8 +42,8 @@ namespace PlcFxUa
                 valueToWrite.AttributeId = Attributes.Value;
                 valueToWrite.Value.Value = SetTypeAndValue();
                 valueToWrite.Value.StatusCode = StatusCodes.Good;
-                valueToWrite.Value.ServerTimestamp = DateTime.MinValue;
-                valueToWrite.Value.SourceTimestamp = DateTime.MinValue;
+                valueToWrite.Value.ServerTimestamp = DateTime.Now;
+                valueToWrite.Value.SourceTimestamp = DateTime.Now;
 
                 WriteValueCollection valuesToWrite = new WriteValueCollection();
                 valuesToWrite.Add(valueToWrite);
@@ -71,9 +78,10 @@ namespace PlcFxUa
                 MessageBox.Show(exc.Message);
             }
         }
+        #endregion
 
-
-        public object SetTypeAndValue()
+        #region Private Members
+        private object SetTypeAndValue()
         {
             //object tempValue = (value != null) ? value.Value : null;
             object tempValue;
@@ -155,5 +163,6 @@ namespace PlcFxUa
 
             return tempValue;
         }
+        #endregion
     }
 }

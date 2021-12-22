@@ -68,7 +68,7 @@ namespace PlcFxUa
             this.BtnDisconnect.TabIndex = 14;
             this.BtnDisconnect.Text = "Disconnect";
             this.BtnDisconnect.UseVisualStyleBackColor = false;
-            this.BtnDisconnect.Click += new System.EventHandler(this.BtnDisconnect_Click_1);
+            this.BtnDisconnect.Click += new System.EventHandler(this.BtnDisconnect_Click);
             // 
             // EditUrl
             // 
@@ -78,7 +78,7 @@ namespace PlcFxUa
             this.EditUrl.ReadOnly = true;
             this.EditUrl.Size = new System.Drawing.Size(592, 26);
             this.EditUrl.TabIndex = 13;
-            this.EditUrl.TextChanged += new System.EventHandler(this.EditUrl_TextChanged);
+            this.EditUrl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.EditUrl_KeyDown);
             // 
             // BtnConnect
             // 
@@ -144,7 +144,6 @@ namespace PlcFxUa
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormConnect";
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.FormConnect_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);

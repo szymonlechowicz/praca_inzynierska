@@ -238,7 +238,6 @@ namespace PlcFxUa
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormStart";
             this.Text = "OPC UA Client";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormStart_FormClosing);
             this.Load += new System.EventHandler(this.FormStart_Load);
             this.panel1.ResumeLayout(false);
             this.panelStatus.ResumeLayout(false);

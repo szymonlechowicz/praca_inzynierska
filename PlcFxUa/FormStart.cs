@@ -18,20 +18,29 @@ namespace PlcFxUa
 {
     public partial class FormStart : Form
     {
+        #region Private Fields
         private Session session;
         private bool connected = false;
         private ApplicationConfiguration config;
         private MBase context;
-        public bool stopMonitoring = false;
 
+        private Form activeForm = null;
+        #endregion
+
+        #region Public Fields
+        public bool stopMonitoring = false;
+        #endregion
+
+        #region Constructors
         public FormStart()
         {
             InitializeComponent();
             connectionLabel.Text = "OPC UA Client";
             operationLabel.Visible = false;
         }
+        #endregion
 
-        private Form activeForm = null;
+        #region Private Members
         private void OpenChildForm(Form childForm)
         {
             if (activeForm != null)
@@ -56,6 +65,9 @@ namespace PlcFxUa
             }
             else OpenChildForm(childForm);
         }
+        #endregion
+
+        #region Event Handlers
         private void menuConnect_Click(object sender, EventArgs e)
         {
             OpenChildForm(new FormConnect(this, session, connected, config));
@@ -83,8 +95,25 @@ namespace PlcFxUa
         {
             OpenIfConnected(new FormData(this, session, context));
         }
+        private void databaseBtn_ButtonClick(object sender, EventArgs e)
+        {
+            stopMonitoring = true;
+            if (context != null)
+            {
+                context.Database.ExecuteSqlCommand("Delete from Items");
+                context.Database.ExecuteSqlCommand("Delete from Measurements");
+                MessageBox.Show("Database clear");
+            }
+            else MessageBox.Show("No context");
+        }
 
+        private void FormStart_Load(object sender, EventArgs e)
+        {
+            OpenChildForm(new FormConnect(this, session, connected, config));
+        }
+        #endregion
 
+        #region Public Interface
         public void GetSession(Session newSession)
         {
             this.session = newSession;
@@ -102,28 +131,6 @@ namespace PlcFxUa
         {
             this.context = newContext;
         }
-
-        private void FormStart_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            
-        }
-
-        private void databaseBtn_ButtonClick(object sender, EventArgs e)
-        {
-            stopMonitoring = true;
-            if (context != null)
-            {
-                context.Database.ExecuteSqlCommand("Delete from Items");
-                context.Database.ExecuteSqlCommand("Delete from Measurements");
-                MessageBox.Show("Database clear");
-            }
-            else MessageBox.Show("No context");
-        }
-
-        private void FormStart_Load(object sender, EventArgs e)
-        {
-            OpenChildForm(new FormConnect(this, session, connected, config));
-        }
-        
+        #endregion
     }
 }

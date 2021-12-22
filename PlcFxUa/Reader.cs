@@ -12,13 +12,20 @@ namespace PlcFxUa
 {
     class Reader
     {
+        #region Private Fields
         private Session session;
         private Form form;
+        #endregion
+
+        #region Contructors
         public Reader(Form mainForm, Session mainSession)
         {
             this.form = mainForm;
             this.session = mainSession;
         }
+        #endregion
+
+        #region Public Interface
         public DataValueCollection ReadTag(string id)
         {
             ReadValueIdCollection readValues = new ReadValueIdCollection();
@@ -36,6 +43,9 @@ namespace PlcFxUa
 
             return ReadDataValues(readValues);
         }
+        #endregion
+
+        #region Private Members
         private DataValueCollection ReadDataValues(ReadValueIdCollection readValues)
         {
             DataValueCollection results = null;
@@ -63,5 +73,6 @@ namespace PlcFxUa
 
             return readValue;
         }
+        #endregion
     }
 }

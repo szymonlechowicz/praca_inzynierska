@@ -15,18 +15,15 @@ namespace PlcFxUa
 {
     public partial class FormConnect : Form
     {
-        private static string myUrl = "opc.tcp://localhost:55000";
-
+        #region Private Fields
+        private static string myUrl = "opc.tcp://192.168.22.143:4840";
         private FormStart parent;
-        
-        public Session session;
-        public bool connected = false;
+        private Session session;
+        private bool connected = false;
         private ApplicationConfiguration config;
+        #endregion
 
-        public FormConnect()
-        {
-            InitializeComponent();
-        }
+        #region Constructors
         public FormConnect(FormStart formStart, Session mainSession, bool mainConnected, ApplicationConfiguration mainConfiguration)
         {
             InitializeComponent();
@@ -42,38 +39,19 @@ namespace PlcFxUa
             //TreeServer.Nodes.Clear();
             if (!connected) BtnDisconnect.Enabled = false;
         }
-       
-      
+        #endregion
 
-        //private void Populate(string path, TreeNode treeNode)
-        //{
-        //    try 
-        //    {
-        //        string[] dirs = Directory.GetDirectories(path);
-        //        foreach (string dir in dirs)
-        //        {
-        //            string[] dirFromPath = dir.Split('\\');
-        //            TreeNode node = new TreeNode(dirFromPath[dirFromPath.Length - 1]);
-        //            treeNode.Nodes.Add(node);
-        //            Populate(dir, node);
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        MessageBox.Show(e.Message);
-        //    }
-        //}
-
+        #region Private Members
         private void Certificate()
         {
             config = new ApplicationConfiguration()
             {
-                ApplicationName = "Dissertation",
-                ApplicationUri = Utils.Format(@"urn:{0}:Dissertation", System.Net.Dns.GetHostName()),
+                ApplicationName = "Bachelor Thesis",
+                ApplicationUri = Utils.Format(@"urn:{0}:Bachelor Thesis", System.Net.Dns.GetHostName()),
                 ApplicationType = ApplicationType.Client,
                 SecurityConfiguration = new SecurityConfiguration
                 {
-                    ApplicationCertificate = new CertificateIdentifier { StoreType = @"Directory", StorePath = @"%CommonApplicationData%\OPC Foundation\CertificateStores\MachineDefault", SubjectName = "Dissertation" },
+                    ApplicationCertificate = new CertificateIdentifier { StoreType = @"Directory", StorePath = @"%CommonApplicationData%\OPC Foundation\CertificateStores\MachineDefault", SubjectName = "Bachelor Thesis" },
                     TrustedIssuerCertificates = new CertificateTrustList { StoreType = @"Directory", StorePath = @"%CommonApplicationData%\OPC Foundation\CertificateStores\UA Certificate Authorities" },
                     TrustedPeerCertificates = new CertificateTrustList { StoreType = @"Directory", StorePath = @"%CommonApplicationData%\OPC Foundation\CertificateStores\UA Applications" },
                     RejectedCertificateStore = new CertificateTrustList { StoreType = @"Directory", StorePath = @"%CommonApplicationData%\OPC Foundation\CertificateStores\RejectedCertificates" },
@@ -92,7 +70,7 @@ namespace PlcFxUa
 
             var application = new ApplicationInstance
             {
-                ApplicationName = "Dissertation",
+                ApplicationName = "Bachelor Thesis",
                 ApplicationType = ApplicationType.Client,
                 ApplicationConfiguration = config
             };
@@ -110,7 +88,15 @@ namespace PlcFxUa
             }
         }
 
+        private void UpdateParent()
+        {
+            parent.GetSession(session);
+            parent.GetBool(connected);
+            parent.GetConfig(config);
+        }
+        #endregion
 
+        #region Event Handlers
         private void BtnConnect_Click(object sender, EventArgs e)
         {
             try
@@ -138,7 +124,7 @@ namespace PlcFxUa
             }
         }
 
-        private void BtnDisconnect_Click_1(object sender, EventArgs e)
+        private void BtnDisconnect_Click(object sender, EventArgs e)
         {
             session.Close();
             if (!session.Connected)
@@ -150,30 +136,41 @@ namespace PlcFxUa
 
             }
         }
-
         private void BtnEditUrl_Click(object sender, EventArgs e)
         {
             if (EditUrl.ReadOnly)
                 EditUrl.ReadOnly = false;
             else EditUrl.ReadOnly = true;
         }
-
-        
-        private void UpdateParent()
+        private void EditUrl_KeyDown(object sender, KeyEventArgs e)
         {
-            parent.GetSession(session);
-            parent.GetBool(connected);
-            parent.GetConfig(config);
-        }
+            if (e.KeyCode == Keys.Enter)
+            {
+                try
+                {
+                    Certificate();
 
-        private void FormConnect_Load(object sender, EventArgs e)
-        {
-            
-        }
+                    string url = EditUrl.Text;
+                    var selectedEndpoint = CoreClientUtils.SelectEndpoint(url, useSecurity: true);
 
-        private void EditUrl_TextChanged(object sender, EventArgs e)
-        {
+                    session = Session.Create(config, new ConfiguredEndpoint(null, selectedEndpoint, EndpointConfiguration.Create(config)),
+                        false, "", 60000, null, null).GetAwaiter().GetResult();
 
+                    if (session != null && !connected)
+                    {
+                        connected = true;
+                        BtnDisconnect.Enabled = true;
+                        UpdateStatus(url);
+                        UpdateParent();
+
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message);
+                }
+            }
         }
+        #endregion
     }
 }

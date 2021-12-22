@@ -18,10 +18,10 @@ namespace PlcFxUa
 {
     public partial class FormPid : Form
     {
+        #region Private Fields
         private FormStart parent;
         private Session session;
         private MBase context;
-        private Subscription subscription;
         private string[] settingIds = new string[6];
         private string[] settingNames = new string[6];
         private string[] dataIds = new string[2];
@@ -30,12 +30,13 @@ namespace PlcFxUa
         private Reader reader;
         private Writer writer;
         private System.Windows.Forms.Timer timer;
+        #endregion
 
+        #region Contructors
         public FormPid(FormStart formStart, Session mainSession, MBase mainContext)
         {
             InitializeComponent();
 
-            helpLabel.Text = "";
             this.parent = formStart;
             this.session = mainSession;
             if (this.session != null)
@@ -105,33 +106,147 @@ namespace PlcFxUa
             //    dataIds[i] = "";
             //    dataNames[i] = "";
             //}
-
-
         }
-        #region Control Events
+        #endregion
+
+        #region Private Members
+        private void AddToDB(DataValue dataValue, string nodeId, string displayName)
+        {
+            string type = dataValue.WrappedValue.TypeInfo.BuiltInType.ToString();
+            if (dataValue.WrappedValue.TypeInfo.ValueRank >= 0)
+                type += "[]";
+
+
+            var measurement = new Measurement()
+            {
+                time = dataValue.SourceTimestamp,
+                value = dataValue.WrappedValue.ToString()
+            };
+
+
+            if (!context.Items.Any(i => i.nodeId == nodeId))
+            {
+                var monitoredItem = new Item
+                {
+                    nodeId = nodeId,
+                    displayName = displayName,
+                    dataType = type,
+                    measurements = new List<Measurement>()
+                };
+
+                monitoredItem.measurements.Add(measurement);
+                context.Items.Add(monitoredItem);
+            }
+            else
+            {
+                Item monitoredItem = context.Items.FirstOrDefault(i => i.nodeId == nodeId);
+                monitoredItem.measurements.Add(measurement);
+            }
+            context.SaveChanges();
+        }
+        private void DrawChart(Chart chart, List<Measurement> measurements, string seriesName)
+        {
+            if (print)
+            {
+                chart.Series.Clear();
+                chart.Series.Add(seriesName);
+                chart.Series[seriesName].ChartType = SeriesChartType.Line;
+                double x;
+                foreach (var measurement in measurements)
+                {
+                    x = (measurement.time.Ticks - measurement.time.Ticks) / 10000000;
+                    chart.Series[seriesName].Points.AddXY(x, Convert.ToDouble(measurement.value));
+                }
+            }
+            else return;
+        }
+        private void UpdateParent()
+        {
+            parent.GetSession(session);
+            parent.GetDB(context);
+        }
+        private static void ExportCSV<T>(List<T> list, string fileName)
+        {
+            try
+            {
+                var sb = new StringBuilder();
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName + ".csv");
+                string header = "";
+                PropertyInfo[] props = typeof(T).GetProperties();
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+                FileStream file = File.Create(path);
+                file.Close();
+                foreach (var prop in props)
+                    header += prop.Name + "; ";
+                header = header.Substring(0, header.Length - 2);
+                sb.AppendLine(header);
+                var writer = new StreamWriter(path, true);
+                writer.Write(sb.ToString());
+                writer.Close();
+                foreach (var obj in list)
+                {
+                    sb = new StringBuilder();
+                    string line = "";
+                    foreach (var prop in props)
+                        line += prop.GetValue(obj, null) + "; ";
+                    line = line.Substring(0, line.Length - 2);
+                    sb.AppendLine(line);
+                    writer = new StreamWriter(path, true);
+                    writer.Write(sb.ToString());
+                    writer.Close();
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
+        }
+        private void WriteAndRead(int index, TextBox textBox)
+        {
+            string nodeToWrite = settingIds[index];
+            var item = context.Items.Single(i => i.nodeId == nodeToWrite);
+
+            this.writer.SetWriter(item.dataType, textBox);
+            writer.WriteNode(this, nodeToWrite);
+
+            context.Items.Remove(item);
+            context.SaveChanges();
+
+
+            DataValueCollection dataValues = new DataValueCollection();
+            dataValues = this.reader.ReadTag(nodeToWrite);
+
+            textBox.Text = dataValues[0].Value.ToString();
+
+            foreach (var value in dataValues)
+            {
+                AddToDB(value, settingIds[index], settingNames[index]);
+                ++index;
+            }
+
+            UpdateParent();
+        }
+        private void ReadAndDraw(string nodeId, string displayName, Chart chart)
+        {
+            AddToDB(this.reader.ReadTag(nodeId)[0], nodeId, displayName);
+
+
+            var item = context.Items.Single(i => i.nodeId == nodeId);
+            var measurements = context.Measurements.Where(m => m.monitoredId == item.ID).ToList();
+            DrawChart(chart, measurements, item.displayName);
+        }
+        #endregion
+
+        #region Event Handlers
         private void FormPid_Load(object sender, EventArgs e)
         {
             if (session == null || !session.Connected)
             {
                 return;
             }
-
-            if (subscription != null)
-            {
-                session.RemoveSubscription(subscription);
-                subscription = null;
-            }
-
-            subscription = new Subscription();
-            subscription.PublishingEnabled = true;
-            subscription.PublishingInterval = 1000;
-            subscription.Priority = 1;
-            subscription.KeepAliveCount = 10;
-            subscription.LifetimeCount = 20;
-            subscription.MaxNotificationsPerPublish = 1000;
-
-            session.AddSubscription(subscription);
-            subscription.Create();
 
             if (context == null)
                 context = new MBase();
@@ -155,7 +270,6 @@ namespace PlcFxUa
                 ++index;
             }
 
-            subscription.ApplyChanges();
             UpdateParent();
         }
         
@@ -247,135 +361,7 @@ namespace PlcFxUa
 
                 ExportCSV(measurements, dataNames[index]);
             }
-
         }
-        #endregion
-        
-        private void AddToDB(DataValue dataValue, string nodeId, string displayName)
-        {
-            string type = dataValue.WrappedValue.TypeInfo.BuiltInType.ToString();
-            if (dataValue.WrappedValue.TypeInfo.ValueRank >= 0)
-                type += "[]";
-
-            
-            var measurement = new Measurement()
-            {
-                time = dataValue.SourceTimestamp,
-                value = dataValue.WrappedValue.ToString()
-            };
-
-
-            if (!context.Items.Any(i => i.nodeId == nodeId))
-            {
-                var monitoredItem = new Item
-                {
-                    nodeId = nodeId,
-                    displayName = displayName,
-                    dataType = type,
-                    measurements = new List<Measurement>()
-                };
-
-                monitoredItem.measurements.Add(measurement);
-                context.Items.Add(monitoredItem);
-            }
-            else
-            {
-                Item monitoredItem = context.Items.FirstOrDefault(i => i.nodeId == nodeId);
-                monitoredItem.measurements.Add(measurement);
-            }
-            context.SaveChanges();
-        }
-        private void DrawChart(Chart chart, List<Measurement> measurements, string seriesName)
-        {
-            if (print)
-            {
-                chart.Series.Clear();
-                chart.Series.Add(seriesName);
-                chart.Series[seriesName].ChartType = SeriesChartType.Line;
-                double x;
-                foreach (var measurement in measurements)
-                {
-                    x = (measurement.time.Ticks - measurement.time.Ticks) / 10000000;
-                    chart.Series[seriesName].Points.AddXY(x, Convert.ToDouble(measurement.value));
-                }
-            }
-            else return;
-        }
-
-        private void UpdateParent()
-        {
-            parent.GetSession(session);
-            parent.GetDB(context);
-        }
-        
-
-        private static void ExportCSV<T>(List<T> list, string fileName)
-        {
-            try
-            {
-                var sb = new StringBuilder();
-                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName + ".csv");
-                string header = "";
-                PropertyInfo[] props = typeof(T).GetProperties();
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-                FileStream file = File.Create(path);
-                file.Close();
-                foreach (var prop in props)
-                    header += prop.Name + "; ";
-                header = header.Substring(0, header.Length - 2);
-                sb.AppendLine(header);
-                var writer = new StreamWriter(path, true);
-                writer.Write(sb.ToString());
-                writer.Close();
-                foreach (var obj in list)
-                {
-                    sb = new StringBuilder();
-                    string line = "";
-                    foreach (var prop in props)
-                        line += prop.GetValue(obj, null) + "; ";
-                    line = line.Substring(0, line.Length - 2);
-                    sb.AppendLine(line);
-                    writer = new StreamWriter(path, true);
-                    writer.Write(sb.ToString());
-                    writer.Close();
-                }
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
-            }
-        }
-        private void WriteAndRead(int index, TextBox textBox)
-        {
-            string nodeToWrite = settingIds[index];
-            var item = context.Items.Single(i => i.nodeId == nodeToWrite);
-
-            this.writer.SetWriter(item.dataType, textBox);
-            writer.WriteNode(this, nodeToWrite);
-
-            context.Items.Remove(item);
-            context.SaveChanges();
-
-
-            DataValueCollection dataValues = new DataValueCollection();
-            dataValues = this.reader.ReadTag(nodeToWrite);
-
-            textBox.Text = dataValues[0].Value.ToString();
-
-            foreach (var value in dataValues)
-            {
-                AddToDB(value, settingIds[index], settingNames[index]);
-                ++index;
-            }
-
-            subscription.ApplyChanges();
-            UpdateParent();
-        }
-
-
         private void btnStop_Click(object sender, EventArgs e)
         {
             this.print = false;
@@ -408,7 +394,6 @@ namespace PlcFxUa
                 timer.Tick += new EventHandler(timer_Tick);
                 timer.Start();
 
-                subscription.ApplyChanges();
                 UpdateParent();
 
                 maxTB.Enabled = false;
@@ -433,24 +418,14 @@ namespace PlcFxUa
                 ReadAndDraw(dataIds[1], dataNames[1], outputChart);
 
                 UpdateParent();
-
-                subscription.ApplyChanges();
             }
         }
-
-        private void ReadAndDraw(string nodeId, string displayName, Chart chart)
-        {
-            AddToDB(this.reader.ReadTag(nodeId)[0], nodeId, displayName);
-
-
-            var item = context.Items.Single(i => i.nodeId == nodeId);
-            var measurements = context.Measurements.Where(m => m.monitoredId == item.ID).ToList();
-            DrawChart(chart, measurements, item.displayName);
-        }
-
         private void btnOpen_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data.csv"));
+            System.Diagnostics.Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dataNames[0] + ".csv"));
+            System.Diagnostics.Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dataNames[1] + ".csv"));
         }
+        #endregion
+
     }
 }

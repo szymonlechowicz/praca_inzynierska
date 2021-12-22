@@ -41,17 +41,24 @@ namespace PlcFxUa
 {
     class BrowsingClass
     {
+        #region Private Fields
         private Session session;
+        #endregion
+
+        #region Construtors
         public BrowsingClass(Session newSession)
         {
             this.session = newSession;
         }
+        #endregion
 
+        #region Public Interface
         public void Populate(NodeId sourceId, TreeNodeCollection nodes)
         {
             Populate(sourceId, nodes, (uint)(NodeClass.Object | NodeClass.ObjectType |
                 NodeClass.Variable | NodeClass.Method | NodeClass.ReferenceType));
         }
+
         public void Populate(NodeId sourceId, TreeNodeCollection nodes, uint nodeClass)
         {
 
@@ -74,7 +81,7 @@ namespace PlcFxUa
             nodeToBrowse2.BrowseDirection = BrowseDirection.Forward;
             nodeToBrowse2.ReferenceTypeId = ReferenceTypeIds.Organizes;
             nodeToBrowse2.IncludeSubtypes = true;
-            nodeToBrowse2.NodeClassMask = (uint)(NodeClass.Object | NodeClass.Variable | NodeClass.Method);
+            nodeToBrowse2.NodeClassMask = nodeClass;
             nodeToBrowse2.ResultMask = (uint)BrowseResultMask.All;
 
             BrowseDescriptionCollection nodesToBrowse = new BrowseDescriptionCollection();
@@ -97,6 +104,9 @@ namespace PlcFxUa
             }
 
         }
+        #endregion
+
+        #region Private Members
         private static ReferenceDescriptionCollection Browse(Session browsingSession, BrowseDescriptionCollection nodesToBrowse, bool throwOnError)
         {
             try
@@ -216,5 +226,6 @@ namespace PlcFxUa
                 return null;
             }
         }
+        #endregion
     }
 }

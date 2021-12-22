@@ -16,6 +16,7 @@ namespace PlcFxUa
 {
     public partial class FormMonitor : Form
     {
+        #region Private Fields
         private FormStart parent;
         private BrowsingClass browsing;
         private Session session;
@@ -23,6 +24,9 @@ namespace PlcFxUa
         private MBase context;
         private bool firstSelection;
         private Writer writer;
+        #endregion
+
+        #region Constructors
         public FormMonitor(FormStart formStart, Session mainSession, MBase mainContext)
         {
             InitializeComponent();
@@ -45,7 +49,50 @@ namespace PlcFxUa
                 "by single click on value and by change value in the textbox next to button 'Modify'.\n" +
                 "NOTICE! If you delete monitored item from the list, you delete it as well from database";
         }
+        #endregion
 
+        #region Private Members
+        private void CreateView()
+        {
+            var query = context.Items.Select(i => new
+            {
+                displayName = i.displayName,
+                dataType = i.dataType,
+                value = i.measurements.OrderByDescending(m => m.time).Select(m => m.value).FirstOrDefault(),
+                time = i.measurements.OrderByDescending(m => m.time).Select(m => m.time).FirstOrDefault(),
+                nodeId = i.nodeId,
+            });
+
+            ItemsView.DataSource = query.ToList();
+
+            WrapContent(ItemsView);
+        }
+        private void AcceptWriting()
+        {
+            this.writer.WriteNode(this, ItemsView.CurrentRow.Cells[5].Value.ToString());
+            CreateView();
+            btnModify.Enabled = false;
+            WriteTextBox.Enabled = false;
+        }
+        private void UpdateParent()
+        {
+            parent.GetSession(session);
+            parent.GetDB(context);
+        }
+        private void WrapContent(DataGridView dgv)
+        {
+            DataGridViewElementStates states = DataGridViewElementStates.None;
+            dgv.ScrollBars = ScrollBars.None;
+            var totalHeight = dgv.Rows.GetRowsHeight(states) + dgv.ColumnHeadersHeight;
+            totalHeight += dgv.Rows.Count;
+            var totalWidth = dgv.Columns.GetColumnsWidth(states);
+            dgv.ClientSize = new Size(totalWidth, totalHeight);
+            dgv.AutoResizeColumns(
+            DataGridViewAutoSizeColumnsMode.AllCells);
+        }
+        #endregion
+
+        #region Event Handlers
         private void treeServer_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             try
@@ -137,83 +184,6 @@ namespace PlcFxUa
                 MessageBox.Show(exc.Message);
             }
         }
-        private void OnNotification(MonitoredItem item, MonitoredItemNotificationEventArgs e)
-        {
-            if(!parent.stopMonitoring)
-            {
-                try
-                {
-                    if (InvokeRequired)
-                    {
-                        BeginInvoke(new MonitoredItemNotificationEventHandler(OnNotification), item, e);
-                        return;
-                    }
-
-                    MonitoredItemNotification data = e.NotificationValue as MonitoredItemNotification;
-
-                    if (data == null) return;
-
-                    string type = data.Value.WrappedValue.TypeInfo.BuiltInType.ToString();
-                    if (data.Value.WrappedValue.TypeInfo.ValueRank >= 0)
-                        type += "[]";
-
-                    string nodeId = item.StartNodeId.ToString();
-
-                    var measurement = new Measurement()
-                    {
-                        time = data.Value.SourceTimestamp,
-                        value = data.Value.WrappedValue.ToString()
-                    };
-
-
-                    if (!context.Items.Any(i => i.nodeId == nodeId))
-                    {
-                        var monitoredItem = new Item
-                        {
-                            nodeId = nodeId,
-                            displayName = item.DisplayName,
-                            dataType = type,
-                            measurements = new List<Measurement>()
-                        };
-
-                        monitoredItem.measurements.Add(measurement);
-                        context.Items.Add(monitoredItem);
-                        context.SaveChanges();
-                    }
-                    else
-                    {
-                        Item monitoredItem = context.Items.FirstOrDefault(i => i.nodeId == nodeId);
-                        monitoredItem.measurements.Add(measurement);
-                        context.SaveChanges();
-                    }
-
-                    CreateView();
-                }
-
-                catch (Exception exc)
-                {
-                    MessageBox.Show(exc.Message);
-                }
-            }
-            
-        }
-
-        private void CreateView()
-        {
-            var query = context.Items.Select(i => new
-            {
-                displayName = i.displayName,
-                dataType = i.dataType,
-                value = i.measurements.OrderByDescending(m => m.time).Select(m => m.value).FirstOrDefault(),
-                time = i.measurements.OrderByDescending(m => m.time).Select(m => m.time).FirstOrDefault(),
-                nodeId = i.nodeId,
-            });
-
-            ItemsView.DataSource = query.ToList();
-
-            WrapContent(ItemsView);
-        }
-
         private void ItemsView_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             DataGridViewRow row = ItemsView.Rows[e.RowIndex];
@@ -292,12 +262,10 @@ namespace PlcFxUa
             }
 
         }
-        
         private void btnModify_Click(object sender, EventArgs e)
         {
             AcceptWriting();
         }
-
         private void WriteTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -305,36 +273,72 @@ namespace PlcFxUa
                 AcceptWriting();
             }
         }
-
-        private void AcceptWriting()
-        {
-            this.writer.WriteNode(this, ItemsView.CurrentRow.Cells[5].Value.ToString());
-            CreateView();
-            btnModify.Enabled = false;
-            WriteTextBox.Enabled = false;
-        }
-
-        private void UpdateParent()
-        {
-            parent.GetSession(session);
-            parent.GetDB(context);
-        }
-        private void WrapContent(DataGridView dgv)
-        {
-            DataGridViewElementStates states = DataGridViewElementStates.None;
-            dgv.ScrollBars = ScrollBars.None;
-            var totalHeight = dgv.Rows.GetRowsHeight(states) + dgv.ColumnHeadersHeight;
-            totalHeight += dgv.Rows.Count;
-            var totalWidth = dgv.Columns.GetColumnsWidth(states);
-            dgv.ClientSize = new Size(totalWidth, totalHeight);
-            dgv.AutoResizeColumns(
-            DataGridViewAutoSizeColumnsMode.AllCells);
-        }
-
         private void FormMonitor_Click(object sender, EventArgs e)
         {
             ItemsView.DataSource = null;
             ItemsView.Rows.Clear();
         }
+
+        private void OnNotification(MonitoredItem item, MonitoredItemNotificationEventArgs e)
+        {
+            if (!parent.stopMonitoring)
+            {
+                try
+                {
+                    if (InvokeRequired)
+                    {
+                        BeginInvoke(new MonitoredItemNotificationEventHandler(OnNotification), item, e);
+                        return;
+                    }
+
+                    MonitoredItemNotification data = e.NotificationValue as MonitoredItemNotification;
+
+                    if (data == null) return;
+
+                    string type = data.Value.WrappedValue.TypeInfo.BuiltInType.ToString();
+                    if (data.Value.WrappedValue.TypeInfo.ValueRank >= 0)
+                        type += "[]";
+
+                    string nodeId = item.StartNodeId.ToString();
+
+                    var measurement = new Measurement()
+                    {
+                        time = data.Value.SourceTimestamp,
+                        value = data.Value.WrappedValue.ToString()
+                    };
+
+
+                    if (!context.Items.Any(i => i.nodeId == nodeId))
+                    {
+                        var monitoredItem = new Item
+                        {
+                            nodeId = nodeId,
+                            displayName = item.DisplayName,
+                            dataType = type,
+                            measurements = new List<Measurement>()
+                        };
+
+                        monitoredItem.measurements.Add(measurement);
+                        context.Items.Add(monitoredItem);
+                        context.SaveChanges();
+                    }
+                    else
+                    {
+                        Item monitoredItem = context.Items.FirstOrDefault(i => i.nodeId == nodeId);
+                        monitoredItem.measurements.Add(measurement);
+                        context.SaveChanges();
+                    }
+
+                    CreateView();
+                }
+
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message);
+                }
+            }
+
+        }
+        #endregion
     }
 }

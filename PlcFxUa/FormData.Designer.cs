@@ -88,7 +88,7 @@ namespace PlcFxUa
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series1.Legend = "Legend1";
-            series1.Name = "Measure";
+            series1.Name = "Measurement";
             this.lineChart.Series.Add(series1);
             this.lineChart.Size = new System.Drawing.Size(1013, 460);
             this.lineChart.TabIndex = 8;

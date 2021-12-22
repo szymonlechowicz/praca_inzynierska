@@ -15,12 +15,15 @@ namespace PlcFxUa
 {
     public partial class FormBrowse : Form
     {
+        #region Private Fields
         private FormStart parent;
         private Session session;
         private Subscription subscription;
         private List<NodeInfo> nodeInfo;
         private BrowsingClass browsing;
+        #endregion
 
+        #region Constructors
         public FormBrowse(FormStart formStart, Session mainSession)
         {
             InitializeComponent();
@@ -28,7 +31,7 @@ namespace PlcFxUa
             treeServer.Nodes.Clear();
             this.parent = formStart;
             this.session = mainSession;
-            
+
             if (this.session != null)
             {
                 this.browsing = new BrowsingClass(this.session);
@@ -43,45 +46,10 @@ namespace PlcFxUa
             }
             label1.Text = "Here you can browse server\nnodes, get info about them and\nyou can start" +
                 " subscribing node\nby double click on the node.\nNOTICE! On this form monitored\nitem doesn't save to database.";
-
-
-
         }
-        
-        private void treeServer_AfterSelect(object sender, TreeViewEventArgs e)
-        {
+        #endregion
 
-            ReferenceDescription rd = e.Node.Tag as ReferenceDescription;
-
-            if (rd == null || rd.NodeId.IsAbsolute)
-            {
-                return;
-            }
-            else
-            {
-                this.nodeInfo = getNodeInfo(rd);
-                tableBrowser.DataSource = this.nodeInfo;
-            }
-            browsing.Populate((NodeId)rd.NodeId, e.Node.Nodes);
-
-
-            tableBrowser.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
-            tableBrowser.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
-            tableBrowser.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
-            tableBrowser.RowHeadersVisible = false;
-            tableBrowser.Visible = true;
-            WrapContent(tableBrowser);
-        }
-        private void WrapContent(DataGridView dgv)
-        {
-            DataGridViewElementStates states = DataGridViewElementStates.None;
-            dgv.ScrollBars = ScrollBars.None;
-            var totalHeight = dgv.Rows.GetRowsHeight(states) + dgv.ColumnHeadersHeight;
-            totalHeight += dgv.Rows.Count;
-            var totalWidth = dgv.Columns.GetColumnsWidth(states);
-            dgv.ClientSize = new Size(totalWidth, totalHeight);
-        }
-
+        #region Private Members
         private List<NodeInfo> getNodeInfo(ReferenceDescription rd)
         {
             Node node = new Node(rd);
@@ -143,7 +111,73 @@ namespace PlcFxUa
 
             return list;
         }
+        
+        private void UpdateParent()
+        {
+            parent.GetSession(session);
+        }
 
+        private void WrapContent(DataGridView dgv)
+        {
+            DataGridViewElementStates states = DataGridViewElementStates.None;
+            dgv.ScrollBars = ScrollBars.None;
+            var totalHeight = dgv.Rows.GetRowsHeight(states) + dgv.ColumnHeadersHeight;
+            totalHeight += dgv.Rows.Count;
+            var totalWidth = dgv.Columns.GetColumnsWidth(states);
+            dgv.ClientSize = new Size(totalWidth, totalHeight);
+        }
+        #endregion
+
+        #region Event Handlers
+        private void treeServer_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            try
+            {
+                // check if node has already been expanded once.
+                if (e.Node.Nodes.Count != 1 || e.Node.Nodes[0].Text != String.Empty)
+                {
+                    return;
+                }
+
+                // get the source for the node.
+                ReferenceDescription rd = e.Node.Tag as ReferenceDescription;
+
+                if (rd == null || rd.NodeId.IsAbsolute)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
+                // populate children.
+                browsing.Populate((NodeId)rd.NodeId, e.Node.Nodes);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
+        private void treeServer_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            ReferenceDescription rd = e.Node.Tag as ReferenceDescription;
+
+            if (rd == null || rd.NodeId.IsAbsolute)
+            {
+                return;
+            }
+            else
+            {
+                this.nodeInfo = getNodeInfo(rd);
+                tableBrowser.DataSource = this.nodeInfo;
+            }
+
+
+            tableBrowser.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            tableBrowser.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            tableBrowser.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
+            tableBrowser.RowHeadersVisible = false;
+            tableBrowser.Visible = true;
+            WrapContent(tableBrowser);
+        }
         private void treeServer_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             try
@@ -200,7 +234,6 @@ namespace PlcFxUa
             }
 
         }
-        
         private void OnNotification(MonitoredItem item, MonitoredItemNotificationEventArgs e)
         {
             if (InvokeRequired)
@@ -214,38 +247,6 @@ namespace PlcFxUa
                 + "Server Timestramp: " + ((MonitoredItemNotification)e.NotificationValue).Value.ServerTimestamp.ToString();
 
         }
-        private void UpdateParent()
-        {
-            parent.GetSession(session);
-        }
-
-        private void treeServer_BeforeExpand(object sender, TreeViewCancelEventArgs e)
-        {
-            try
-            {
-                // check if node has already been expanded once.
-                if (e.Node.Nodes.Count != 1 || e.Node.Nodes[0].Text != String.Empty)
-                {
-                    return;
-                }
-
-                // get the source for the node.
-                ReferenceDescription rd = e.Node.Tag as ReferenceDescription;
-
-                if (rd == null || rd.NodeId.IsAbsolute)
-                {
-                    e.Cancel = true;
-                    return;
-                }
-
-                // populate children.
-                browsing.Populate((NodeId)rd.NodeId, e.Node.Nodes);
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
-        }
+        #endregion
     }
-
 }
