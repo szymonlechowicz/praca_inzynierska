@@ -292,6 +292,15 @@
     <Compile Include="MBase.cs" />
     <Compile Include="Measurement.cs" />
     <Compile Include="Item.cs" />
+    <Compile Include="Migrations\202112061906040_InitialCreate.cs" />
+    <Compile Include="Migrations\202112061906040_InitialCreate.designer.cs">
+      <DependentUpon>202112061906040_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202112281239556_final.cs" />
+    <Compile Include="Migrations\202112281239556_final.designer.cs">
+      <DependentUpon>202112281239556_final.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeInfo.cs" />
     <Compile Include="FormBrowse.cs">
       <SubType>Form</SubType>
@@ -346,6 +355,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormStart.resx">
       <DependentUpon>FormStart.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202112061906040_InitialCreate.resx">
+      <DependentUpon>202112061906040_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202112281239556_final.resx">
+      <DependentUpon>202112281239556_final.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

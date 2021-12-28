@@ -177,7 +177,6 @@ namespace PlcFxUa
                 }
 
                 subscription.ApplyChanges();
-                UpdateParent();
             }
             catch (Exception exc)
             {
@@ -306,8 +305,7 @@ namespace PlcFxUa
                         time = data.Value.SourceTimestamp,
                         value = data.Value.WrappedValue.ToString()
                     };
-
-
+                    
                     if (!context.Items.Any(i => i.nodeId == nodeId))
                     {
                         var monitoredItem = new Item
@@ -330,6 +328,7 @@ namespace PlcFxUa
                     }
 
                     CreateView();
+                    UpdateParent();
                 }
 
                 catch (Exception exc)
